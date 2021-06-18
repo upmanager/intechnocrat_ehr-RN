@@ -32,6 +32,7 @@ export default class Index extends Component {
       blackColor,
       redColor,
       transparent,
+      lightGrayColor,
       // 
       flexCenter,
       flexLeft,
@@ -64,6 +65,7 @@ export default class Index extends Component {
 
           //custom for color
           primaryColor && StyleSheet.flatten({ color: BaseColor.primaryColor }),
+          lightGrayColor && StyleSheet.flatten({ color: BaseColor.lightGrayColor }),
           whiteColor && StyleSheet.flatten({ color: BaseColor.whiteColor }),
           grayColor && StyleSheet.flatten({ color: BaseColor.grayColor }),
           blackColor && StyleSheet.flatten({ color: BaseColor.blackColor }),
