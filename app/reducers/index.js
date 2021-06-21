@@ -1,8 +1,12 @@
 import { combineReducers } from "redux";
-import users from "./users";
+import auth from "./auth";
 import units from "./units";
+import devices from "./devices";
+import global from "./global";
 
 export default combineReducers({
-  users,
+  auth,
   units,
+  devices,
+  global
 });

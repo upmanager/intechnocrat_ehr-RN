@@ -13,7 +13,7 @@ export default function ButtonSelector(props) {
     useEffect(() => {
         if (visible) {
             RBSheetRef?.current?.open();
-        }else{
+        } else {
             RBSheetRef?.current?.close();
         }
     }, [visible]);
@@ -22,12 +22,12 @@ export default function ButtonSelector(props) {
             let list = null;
             if ("list" in item) list = item.list;
             else if ("maxValue" in item && "minValue" in item) {
-                list = Array.apply(null, Array(item.maxValue - item.minValue))
+                list = Array.apply(null, Array(item.maxValue - item.minValue + 1))
                     .map((_, i) => i + item.minValue);
             } else if ("startweek" in item) {
                 list = [...ALLWEEKS.slice(item.startweek, ALLWEEKS.length), ...ALLWEEKS.slice(0, item.startweek)];
             }
-            return { key: item.key, list };
+            return { ...item, list };
         })
             .filter(item => item);
         setpickers(picker_data);
@@ -87,7 +87,7 @@ export default function ButtonSelector(props) {
                         itemStyle={styles.pickerItem}
                         onValueChange={(index) => onPickerSelect(index, item.key)}>
                         {item.list.map((value, i) => (
-                            <Picker.Item label={String(value)} value={i} key={`picker_${item.key}_${i}`} />
+                            <Picker.Item label={`${item.prefix || ''}${value}${item.suffix || ''}`} value={i} key={`picker_${item.key}_${i}`} />
                         ))}
                     </Picker>
 

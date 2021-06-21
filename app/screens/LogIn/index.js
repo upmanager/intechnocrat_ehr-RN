@@ -7,6 +7,7 @@ import { Button, Input } from 'react-native-elements';
 import { connect } from "react-redux";
 import styles from "./styles";
 import { PasswordInput, Text } from "@components";
+
 class LogIn extends Component {
   state = {
     email: '',
@@ -47,10 +48,10 @@ class LogIn extends Component {
       return;
     }
     this.setState({ signing: true });
-    setTimeout(() => {
+    this.props.login(this.state, res => {
       this.setState({ signing: false });
       this.props.navigation.navigate("Main");
-    }, 3000);
+    });
   }
   goSignUp() {
     this.props.navigation.navigate("SignUp");

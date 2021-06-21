@@ -1,12 +1,12 @@
 import * as reduxActions from "@actions";
-import { Header } from "@components";
+import { Header, Text } from "@components";
+import { BaseColor } from "@config";
 import React, { Component } from 'react';
 import { ScrollView } from 'react-native';
+import { Icon } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import styles from './styles';
-import { Icon } from "react-native-elements";
-import { BaseColor } from "@config";
 
 export class index extends Component {
   goBack() {
@@ -22,7 +22,9 @@ export class index extends Component {
           }
           onPressLeft={this.goBack.bind(this)}
         />
-        <ScrollView></ScrollView>
+        <ScrollView>
+          <Text title1 primaryColor>About us</Text>
+        </ScrollView>
       </SafeAreaView>
     )
   }

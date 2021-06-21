@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import styles from './styles';
 import { Icon, ButtonGroup } from "react-native-elements";
 import { BaseColor, BaseConfig } from "@config";
+import { getTemperature } from "@utils";
 
 const _UNITS = [
   {

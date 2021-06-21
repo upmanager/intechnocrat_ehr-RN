@@ -10,6 +10,7 @@ import { BaseColor } from "@config";
 const _PERMISSIONS = [
   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
   PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+  PermissionsAndroid.PERMISSIONS.CAMERA,
 ];
 
 class Loading extends Component {
@@ -18,9 +19,13 @@ class Loading extends Component {
   }
   componentDidMount() {
     this.requestAndroidPermission();
+    const { auth } = this.props;
     setTimeout(() => {
-      this.props.navigation.navigate("Main");
-      // this.props.navigation.navigate("LogIn");
+      if (auth.login) {
+        this.props.navigation.navigate("Main");
+      } else {
+        this.props.navigation.navigate("LogIn");
+      }
     }, 1500);
   }
   requestAndroidPermission = async () => {

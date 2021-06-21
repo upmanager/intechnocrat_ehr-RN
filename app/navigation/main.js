@@ -9,6 +9,7 @@ import Global from "@screens/Global";
 import Units from "@screens/Units";
 import Profile from "@screens/Profile";
 import About from "@screens/About";
+import QRCodeScan from "@screens/QRCodeScan";
 import React from "react";
 import { Icon } from 'react-native-elements';
 import { connect } from "react-redux";
@@ -79,7 +80,7 @@ export default function Navigation() {
         <Stack.Screen name="Units" component={Units} options={horizontalAnimation} />
         <Stack.Screen name="About" component={About} options={horizontalAnimation} />
         <Stack.Screen name="Profile" component={Profile} options={horizontalAnimation} />
-        
+        <Stack.Screen name="QRCodeScan" component={QRCodeScan} options={horizontalAnimation} />        
       </Stack.Navigator>
     </NavigationContainer>
   )

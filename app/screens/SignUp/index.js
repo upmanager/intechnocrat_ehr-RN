@@ -214,6 +214,7 @@ class LogIn extends Component {
           renderItem={({ item, index }) => item()}
           sliderWidth={getDeviceWidth()}
           itemWidth={getDeviceWidth()}
+          scrollEnabled={false}
           currentScrollPosition={2}
         />
         {registering &&

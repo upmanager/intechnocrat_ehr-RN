@@ -1,37 +1,64 @@
 import * as reduxActions from "@actions";
 import { Header, Text, ButtonSelector } from "@components";
 import React, { Component } from 'react';
-import { ScrollView, View, TextInput, TouchableOpacity } from 'react-native';
+import { ScrollView, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import styles from './styles';
-import { Icon, Avatar, Input } from "react-native-elements";
-import { BaseColor } from "@config";
+import { Icon, Avatar, Input, Button, Overlay } from "react-native-elements";
+import { BaseColor, BaseConfig } from "@config";
 import moment from "moment";
+import { convertUnits } from "@utils";
+import ImagePicker from 'react-native-image-crop-picker';
 
+const _UPDATEKEYS = [
+  'name', 'avatar', 'email', 'gender', 'height', 'weight', 'birthday', 'region', 'athlete', 'daily_activity'
+]
 const TESTIMAGEURL = 'https://raw.githubusercontent.com/iHealthDeviceLabs/iHealth-React-Native-SDK/main/doc/integrate-ios.png';
 
 export class index extends Component {
   state = {
-    name: 'test user',
-    email: "test@gmail.com",
-    gender: "Male",
-    height: '155',
-    weight: 45.7,
-    birthday: "05/01/1990",
-    region: "United States",
-    athlete: "No",
-    daily_activity: "Sedentary",
+    name: '',
+    avatar: "",
+    email: "",
+    gender: "",
+    height: '',
+    weight: 0,
+    birthday: "",
+    region: "",
+    athlete: "",
+    daily_activity: "",
+    saved: true,
+    saving: false,
     bottomSheet: {
       visible: false,
       data: [],
       values: {}
+    },
+    update_avatar: {
+      avatar: "",
+      visible: false,
     }
   }
+  cur_weight_unit = {};
+  cur_height_unit = {};
   componentDidMount() {
-    // this.RBSheet.open();
+    const { auth: { user } } = this.props;
+    const { units: { weight, height } } = this.props;
+    this.cur_height_unit = BaseConfig.UNITS['height'][height];
+    this.cur_weight_unit = BaseConfig.UNITS['weight'][weight];
+
+    _UPDATEKEYS.map(key => {
+      if (user[key] != this.state[key]) {
+        this.setState({ [key]: user[key] || '' });
+      }
+    })
   }
   goBack() {
+    const { saved } = this.state;
+    if (!saved) {
+      this.onSave();
+    }
     this.props.navigation.goBack();
   }
   visibleDialog(key) {
@@ -60,14 +87,24 @@ export class index extends Component {
         }
         break;
       case "height":
-        dlgData = [
-          { maxValue: 255, minValue: 50, key },
-        ];
-        values = { [key]: parseInt(this.state[key]) };
+        if (this.cur_height_unit.default) {
+          dlgData = [
+            { maxValue: 255, minValue: 50, key },
+          ];
+          values = { [key]: parseInt(this.state[key]) };
+        } else {
+          const { feet, inches } = convertUnits(this.state[key], this.cur_height_unit, 1);
+          dlgData = [
+            { maxValue: 8, minValue: 1, key: "feet", suffix: " \'" },
+            { maxValue: 11, minValue: 0, key: "inches", suffix: " \"" },
+          ];
+          values = { feet, inches };
+        }
         break;
       case "weight":
+        const _def = this.cur_weight_unit.default;
         dlgData = [
-          { maxValue: 2, minValue: 0, key: "weight_100" },
+          { maxValue: _def ? 2 : 5, minValue: 0, key: "weight_100" },
           { maxValue: 9, minValue: 0, key: "weight_10" },
           { maxValue: 9, minValue: 0, key: "weight_1" },
           { list: ["."], key: "" },
@@ -111,13 +148,24 @@ export class index extends Component {
       }
     });
   }
-  renderInput(title, placeholder, key) {
+  renderInput(title, placeholder, key, unit) {
     const isDisable = key == "email" || key == "region";
     const isInput = key == "name";
+    let value = this.state[key];
+
+    if (key == "weight") {
+      value = convertUnits(value, this.cur_weight_unit, 1);
+    }
+    if (key == "height") {
+      if (!this.cur_height_unit.default) {
+        const { feet, inches } = convertUnits(value, this.cur_height_unit, 1);
+        value = `${feet || ''}\' ${inches || ''}\"`;
+      }
+    }
 
     const InputComponent = !isDisable && !isInput && {
-      InputComponent: (props) => (
-        <TouchableOpacity {...props} onPress={this.visibleDialog.bind(this, key)}>
+      InputComponent: React.forwardRef((props, ref) =>
+        <TouchableOpacity ref={ref} {...props} onPress={this.visibleDialog.bind(this, key)}>
           <Text {...props} style={[props.style, { textAlignVertical: "center" }]}>{props.value}</Text>
         </TouchableOpacity>
       )
@@ -125,11 +173,13 @@ export class index extends Component {
     return (
       <Input
         leftIcon={<Text>  {title}  </Text>}
+        rightIcon={unit && <Text> {unit}</Text>}
         placeholder={placeholder}
         containerStyle={{ backgroundColor: BaseColor.whiteColor }}
         errorStyle={{ height: 0 }}
         inputStyle={{ textAlign: "right", fontSize: 16 }}
-        value={this.state[key]}
+        value={String(value)}
+        onChangeText={txt => this.onDone({ [key]: txt })}
         disabled={isDisable}
         {...InputComponent}
       />
@@ -140,26 +190,88 @@ export class index extends Component {
       const birthday = moment().year(res.year).month(parseInt(res.month) - 1).date(res.day).format('L');
       res = { birthday };
     } else if ("weight_01" in res) {
-      const weight = parseFloat(`${res.weight_100}${res.weight_10}${res.weight_1}.${res.weight_01}`);
+      let weight = parseFloat(`${res.weight_100}${res.weight_10}${res.weight_1}.${res.weight_01}`);
+      weight = convertUnits(weight, this.cur_weight_unit, 2, true);
       res = { weight };
     }
-    this.setState({ ...res })
+    else if ("feet" in res && "inches" in res) {
+      const height = convertUnits({ ...res }, this.cur_height_unit, 2, true);
+      res = { height };
+    }
+    this.setState({ ...res, saved: false })
+  }
+  onSave() {
+    let data = { ...this.state };
+    delete data.bottomSheet;
+    delete data.saved;
+    delete data.saving;
+    delete data.avatar;
+    this.setState({ saving: true });
+    setTimeout(() => {
+      this.setState({ saving: false })
+      this.setState({ saved: true });
+      this.props.updateUser(data);
+    }, 5000);
+  }
+  selectImage(isCamera) {
+    const options = {
+      cropping: true,
+      cropperCircleOverlay: true
+    };
+    let pickerFunction = ImagePicker.openPicker;
+    if (isCamera) {
+      pickerFunction = ImagePicker.openCamera;
+    }
+    pickerFunction(options)
+      .then(res => {
+        console.log("image select", res);
+        this.updateAvatarState({ avatar: res });
+      })
+      .catch(err => {
+        this.updateAvatarState({ avatar: null });
+        console.log("select error", err);
+      })
+  }
+  updateAvatarState(item) {
+    this.setState({
+      update_avatar: {
+        ...this.state.update_avatar,
+        ...item
+      }
+    });
+  }
+  onUpdateAvatar() {
+    const { update_avatar } = this.state;
+    this.setState({
+      avatar: update_avatar.avatar.path
+    });
+    this.props.updateUser({ avatar: update_avatar.avatar.path });
+    this.toggleUpdateAvatar();
+  }
+  toggleUpdateAvatar() {
+    const { update_avatar } = this.state;
+    this.updateAvatarState({ visible: !update_avatar.visible, avatar: null });
   }
   render() {
-    const { bottomSheet } = this.state;
+    const { auth: { user } } = this.props;
+    const { bottomSheet, saved, update_avatar, avatar, saving } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <Header
+          saving={saving}
           renderCenter={
             <View style={styles.headerContain}>
               <View style={styles.headerAvatar}>
                 <Avatar
                   rounded
                   size={'large'}
-                  source={{ uri: TESTIMAGEURL }}
-                />
+                  source={{ uri: user.avatar || '' }}
+                  title={user.name?.slice(0, 2) || "Avatar"}
+                >
+                  <Avatar.Accessory size={30} onPress={this.toggleUpdateAvatar.bind(this)} />
+                </Avatar>
               </View>
-              <Text whiteColor headline> Daniel </Text>
+              <Text whiteColor headline> {user.name} </Text>
             </View>
           }
 
@@ -173,12 +285,19 @@ export class index extends Component {
           {this.renderInput("Account", "", "email")}
           {this.renderInput("Gender", "", "gender")}
           {this.renderInput("Birthday", "", "birthday")}
-          {this.renderInput("Height", "", "height")}
-          {this.renderInput("Weight", "", "weight")}
+          {this.renderInput("Height", "", "height", this.cur_height_unit?.unit)}
+          {this.renderInput("Weight", "", "weight", this.cur_weight_unit?.unit)}
           {this.renderInput("Region", "", "region")}
           {this.renderInput("Athlete", "", "athlete")}
           {this.renderInput("Daily activity", "", "daily_activity")}
         </ScrollView>
+        <View style={{ width: "100%", paddingVertical: 5, paddingHorizontal: 30 }}>
+          <Button
+            title={"Save"}
+            disabled={saved}
+            onPress={this.onSave.bind(this)}
+          />
+        </View>
         {/* data:
               {maxValue, minValue} => number range
               {startweek:0} => week range, 0=>Sunday
@@ -198,6 +317,29 @@ export class index extends Component {
             })
           }}
         />
+        <Overlay isVisible={update_avatar.visible} onBackdropPress={this.toggleUpdateAvatar.bind(this)} overlayStyle={{ width: "80%" }}>
+          <Text title2 primaryColor bold> Update your avatar</Text>
+          <View style={{ justifyContent: "center", alignItems: "center", marginVertical: 10 }}>
+            <Avatar
+              rounded
+              size={'xlarge'}
+              source={{ uri: update_avatar.avatar?.path || avatar || '' }}
+              title={user.name?.slice(0, 2) || "Avatar"}
+            />
+          </View>
+          {update_avatar.avatar ?
+            <>
+              <Button title={"Update"} containerStyle={{ marginVertical: 10 }} onPress={this.onUpdateAvatar.bind(this)} />
+              <Button title={"Cancel"} type="outline" onPress={this.toggleUpdateAvatar.bind(this)} />
+            </ >
+            :
+            <>
+              <Button title={"Open Camera"} containerStyle={{ marginVertical: 10 }} onPress={this.selectImage.bind(this, true)} />
+              <Button title={"Open Gallery"} type="outline" onPress={this.selectImage.bind(this, false)} />
+            </>
+
+          }
+        </Overlay>
       </SafeAreaView>
     )
   }

@@ -40,6 +40,7 @@ export default class CustomTabView extends Component {
                     textStyle={{ fontSize: 20, color: BaseColor.lightGrayColor }}
                 />
                 <Carousel
+                    onSnapToItem={(curIndex) => this.setState({ curIndex })}
                     ref={ref => this._carousel = ref}
                     sliderWidth={getDeviceWidth()}
                     itemWidth={getDeviceWidth()}

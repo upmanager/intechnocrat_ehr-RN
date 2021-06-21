@@ -1,48 +1,35 @@
 import * as reduxActions from "@actions";
 import { DeviceItem, Header, Text } from "@components";
-import { BaseColor } from "@config";
+import { BaseColor, BaseConfig } from "@config";
+import { convertUnits } from "@utils";
 import React, { Component } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import { Avatar, Icon, Button } from "react-native-elements";
+import { Avatar, Button, Icon } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import styles from './styles';
-import { Images } from "@assets";
-import { iHealthDeviceManagerModule } from '@ihealth/ihealthlibrary-react-native';
 
-const TESTIMAGEURL = 'https://raw.githubusercontent.com/iHealthDeviceLabs/iHealth-React-Native-SDK/main/doc/integrate-ios.png';
-const data = [
-  {
-    name: "Track-09EA345",
-    image: Images.bp_monitor
-  },
-  {
-    name: "Fit/Nexus-19BE544",
-    image: Images.diagonal
-  },
-  {
-    name: "PT3SBT-28AE238",
-    image: Images.glucometer
-  },
-  {
-    name: "Air-19BE544",
-    image: Images.wave
-  },
-];
 export class index extends Component {
-  state = {
-    devices: []
-  }
-  componentDidMount() {
-    this.setState({ devices: data });
-    // this.props.healthDeviceEmitter();
-    iHealthDeviceManagerModule.sdkAuthWithLicense("licence.pem");
-  }
   addNewDevice() {
     this.props.navigation.navigate("AddDevice");
   }
+  onDevicePress(device) {
+    console.log(device);
+  }
+  getData(_H) {
+    const { auth: { user: { height, weight } }, units: { height: height_units, weight: weight_units } } = this.props;
+    const cur_unit = BaseConfig.UNITS[_H ? 'height' : 'weight'][_H ? height_units : weight_units];
+    let real_height = convertUnits(_H ? height : weight, cur_unit, 1);
+    if (typeof real_height == "object") {
+      const { feet, inches } = real_height;
+      real_height = `${feet}' ${inches}"`;
+    } else {
+      real_height = `${real_height} ${cur_unit.unit}`;
+    }
+    return `${_H ? "Height" : "Weight"}: ${real_height}`;
+  }
   render() {
-    const { devices } = this.state;
+    const { devices: { devices }, auth: { user } } = this.props;
     return (
       <SafeAreaView style={styles.container}>
         <Header
@@ -52,13 +39,13 @@ export class index extends Component {
                 <Avatar
                   rounded
                   size={'xlarge'}
-                  source={{ uri: TESTIMAGEURL }}
+                  source={{ uri: user.avatar }}
                 />
               </View>
               <View style={styles.headerDetail}>
-                <Text whiteColor headline> Height: 170 cm</Text>
+                <Text whiteColor headline>{this.getData(true)}</Text>
                 <Text title2 grayColor > | </Text>
-                <Text whiteColor headline> Weight: 65.0 kg</Text>
+                <Text whiteColor headline>{this.getData(false)}</Text>
               </View>
             </View>
           }
@@ -70,7 +57,7 @@ export class index extends Component {
         <View style={{ width: "100%", padding: 20, paddingBottom: 0 }}>
           <Text blackColor title3>My Devices</Text>
         </View>
-        {devices.length > 0 ?
+        {devices?.length > 0 ?
           <FlatList
             data={devices}
             style={{ width: "100%" }}
@@ -80,16 +67,17 @@ export class index extends Component {
               <RefreshControl
                 colors={[BaseColor.primaryColor]}
                 refreshing={false}
-                onRefresh={this.componentDidMount.bind(this)} />
+                onRefresh={() => console.log("refresh")}
+              />
             }
-            renderItem={({ item, index }) => <DeviceItem {...item} />}
+            renderItem={({ item, index }) => <DeviceItem {...item} onPress={this.onDevicePress.bind(this, item)} />}
           />
           :
-          <View style={{ flex: 1, marginTop:40 }}>
+          <View style={{ flex: 1, marginTop: 40 }}>
             <Text flexCenter headline>You don't have any iHealth devices set up yet!</Text>
             <Button
               title="Select New Device"
-              containerStyle={{ marginTop: 20 }}
+              containerStyle={{ margin: 20 }}
               buttonStyle={{ paddingHorizontal: 15 }}
               onPress={this.addNewDevice.bind(this)}
             />

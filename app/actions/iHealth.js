@@ -28,7 +28,7 @@ const deviceLinster = (type, callback) => {
 const emitterTimeout = (callback) => {
     setTimeout(() => {
         callback("timeout");
-    }, 10000);
+    }, 60000);
 }
 export const startDiscover = (...params) => {
     return new Promise((resolve, reject) => {

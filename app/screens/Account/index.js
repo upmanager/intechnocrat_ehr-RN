@@ -9,7 +9,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import styles from './styles';
-const TESTIMAGEURL = 'https://raw.githubusercontent.com/iHealthDeviceLabs/iHealth-React-Native-SDK/main/doc/integrate-ios.png';
 
 export class index extends Component {
   renderAccountItem(icon, title, onPress, isAccount = false) {
@@ -31,11 +30,12 @@ export class index extends Component {
     this.props.navigation.navigate(page);
   }
   renderAccount() {
+    const { auth: { user } } = this.props;
     return (
       <>
         <Header title={"Account"} />
-        {this.renderAccountItem({ uri: TESTIMAGEURL }, "Ke hq", this.onDetail.bind(this, "Profile"), true)}
-        {/* {this.renderAccountItem({ name: "plus", type: "evilicon", size: 24 }, "Global", this.onDetail.bind(this, "Global"))} */}
+        {this.renderAccountItem({ uri: user.avatar, title: user.name?.slice(0, 2) || "Avatar" }, user.name, this.onDetail.bind(this, "Profile"), true)}
+        {this.renderAccountItem({ name: "plus", type: "evilicon", size: 24 }, "Global", this.onDetail.bind(this, "Global"))}
         {this.renderAccountItem({ name: "pencil-ruler", type: "material-community", size: 24 }, "Units", this.onDetail.bind(this, "Units"))}
         {this.renderAccountItem({ name: "infocirlceo", type: "antdesign", size: 24 }, "About", this.onDetail.bind(this, "About"))}
         <TouchableOpacity
@@ -58,6 +58,7 @@ export class index extends Component {
           sliderWidth={getDeviceWidth()}
           itemWidth={getDeviceWidth()}
           data={this.getData()}
+          scrollEnabled={false}
           renderItem={({ item, index }) => item}
         />
       </SafeAreaView>

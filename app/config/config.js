@@ -7,23 +7,23 @@ export const CLIENTSECURITY = '9a41ec10e873496791bd331525b2f457';
 export const IHEALTHAPIURL = 'https://api.ihealthlabs.com:8443/OpenApiV2/';
 export const UNITS = {
     bp: [
-        { unit: "mmHg" },
+        { unit: "mmHg", default: true },
         { unit: "kPa" }
     ],
     weight: [
-        { unit: "kg" },
+        { unit: "kg", default: true },
         { unit: "lbs" }
     ],
     distance: [
-        { unit: "km" },
+        { unit: "km", default: true },
         { unit: "miles" }
     ],
     height: [
-        { unit: "cm" },
+        { unit: "cm", default: true },
         { unit: "feet" }
     ],
     temperature: [
-        { unit: "°C" },
+        { unit: "°C", default: true },
         { unit: "°F" }
     ],
 }

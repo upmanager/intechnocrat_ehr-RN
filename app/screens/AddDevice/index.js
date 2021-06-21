@@ -1,19 +1,15 @@
 import * as reduxActions from "@actions";
+import { Images } from "@assets";
 import { Header, Text } from "@components";
+import { BaseColor } from "@config";
+import { getDeviceWidth } from "@utils";
 import React, { Component } from 'react';
-import { FlatList, View, TouchableOpacity, ActivityIndicator, DeviceEventEmitter } from 'react-native';
+import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native';
+import { Button, Icon, Image } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import styles from './styles';
-import { Icon, Image, Button } from "react-native-elements";
-import { BaseColor } from "@config";
-import { Images } from "@assets";
-import Carousel from 'react-native-snap-carousel';
-import { getDeviceWidth } from "@utils";
-import {
-  HS2Module,
-  HSProfileModule,
-} from '@ihealth/ihealthlibrary-react-native';
 
 const { iHealth } = reduxActions;
 const data = [
@@ -116,7 +112,13 @@ const data = [
         id: 2,
         title: "Lite (HS4S)",
         image: Images.lite_hs4s,
-        device: 'HS4S'
+        device: 'HS4S',
+        setup_guide: [
+          {
+            description: `Install batteries.`,
+            image: Images.setup_hs2_1,
+          }
+        ]
       },
       {
         id: 3,
@@ -188,59 +190,42 @@ export class index extends Component {
       this._carousel.snapToNext();
     });
   }
-  componentDidMount() {
-    // this.addDevice();
-  }
-  componentWillUnmount() {
-    // this.notifyListener.remove();
-  }
   addDevice() {
     const { curId, selectedDevice } = this.state;
-    iHealth.authenConfigureInfo("Wilfred", 'b619c60bdc7942d693f14d1d8cda16f3', '9a41ec10e873496791bd331525b2f457')
-      .then(res => {
-        console.log("get authen", res);
-      })
-      .catch(err => {
-        console.log("get authen", err);
-      });
     iHealth.startDiscover(selectedDevice)
       .then(res => {
         console.log("discover", res);
       })
       .catch(err => {
         console.log("discover", err);
+      })
+      .finally(() => {
+        let cur_device = data.find(item => item.id == curId).devices.find(item => item.device == selectedDevice);
+        const key = `${(new Date()).getTime()}${parseInt(Math.random() * 99 + 100)}`;
+        cur_device = { ...cur_device, key };
+        this.props.addDevice(cur_device);
+        this.props.navigation.goBack();
       });
-    // iHealthDeviceManagerModule.startDiscovery(selectedDevice);
-    // add
-    // HS2Module.startMeasure(mac);
-
-    this.notifyListener = DeviceEventEmitter.addListener(HS2Module.Event_Notify, (event) => {
-      if (event.action === HSProfileModule.ACTION_ONLINE_RESULT_HS) {
-        console.log(event[HSProfileModule.DATAID]);
-        console.log(event[HSProfileModule.WEIGHT_HS]);
-        console.log(event[HSProfileModule.FAT_HS]);
-        console.log(event[HSProfileModule.WATER_HS]);
-        console.log(event[HSProfileModule.MUSCLE_HS]);
-        console.log(event[HSProfileModule.SKELETON_HS]);
-        console.log(event[HSProfileModule.FATELEVEL_HS]);
-        console.log(event[HSProfileModule.DCI_HS]);
-      }
-    });
-
-    // BP3LModule.getAllConnectedDevices();
   }
-  chooseDevice({ device, setup_guide, scanQRcode }) {
+  chooseDevice({ device }) {
+    const { curId } = this.state;
     this.setState({
       selectedDevice: device
     }, () => {
+      if (curId == 2 || curId == 3) {
+      } else {
+        this.addDevice();
+      }
       this._carousel.snapToNext();
     });
   }
   renderItem({ item, index }) {
+    const disabled = item.id != 3;
     return (
       <TouchableOpacity
         onPress={this.chooseCategory.bind(this, item)}
-        style={styles.device_categories}>
+        disabled={disabled}
+        style={[styles.device_categories, disabled && { opacity: .3 }]}>
         <Text blackColor style={{ flex: 1 }}>{item.title}</Text>
         <Image source={item.image} style={styles.category_img} resizeMode={'cover'} />
         <Icon name={'angle-right'} size={24} type={'font-awesome'} color={BaseColor.grayColor} />
@@ -298,9 +283,15 @@ export class index extends Component {
       </>
     )
   }
+  scanedQRcode(data) {
+    console.log("qr code data", data);
+  }
   scanQRcode() {
-    console.log("scan qr code");
-    // this._carousel.snapToNext();
+    this.props.navigation.navigate("QRCodeScan", { onDone: this.scanedQRcode.bind(this) });
+  }
+  onConnect() {
+    this._carousel.snapToNext();
+    this.addDevice();
   }
   renderSetupGuide() {
     const { curId, selectedDevice } = this.state;
@@ -341,7 +332,7 @@ export class index extends Component {
               containerStyle={styles.mt20}
               buttonStyle={styles.next_button}
               titleStyle={styles.next_button_txt}
-              onPress={() => this._carousel.snapToNext()}
+              onPress={this.onConnect.bind(this)}
             />
           </View>
         }
@@ -404,6 +395,7 @@ export class index extends Component {
           ref={ref => this._carousel = ref}
           sliderWidth={getDeviceWidth()}
           itemWidth={getDeviceWidth()}
+          scrollEnabled={false}
           data={this.getData()}
           renderItem={({ item, index }) => item}
         />
