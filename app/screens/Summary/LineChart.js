@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { LayoutAnimation, StyleSheet, View } from 'react-native';
-//If you have not Expo import https://github.com/react-native-community/react-native-svg
+//https://github.com/react-native-community/react-native-svg
 import Svg, {
-    Circle,
-    G,
-    Line,
-    Path, Rect, Text
+    Circle, G, Line, Path, Rect, Text, TSpan
 } from 'react-native-svg';
 
 export default class LineChart extends Component {
@@ -132,7 +129,7 @@ export default class LineChart extends Component {
             horizontalLines,
         } = this.state;
         const background = axis.map((_, i) => {
-            if (i == 0) return <></>;
+            if (i == 0) return null;
             const fill = colors.fillColor[i % colors.fillColor.length];
             return <Rect key={`rect_${i}`} x={(i - 1) * stepX + margin.left} y={-height + margin.top} width={stepX} height={height - margin.bottom - margin.top} fill={fill} />
         });
@@ -174,8 +171,20 @@ export default class LineChart extends Component {
         });
         const axisXLabel = axis.map((item, i) => {
             let each = Math.round(labelWidth / stepX);
+            let text = item;
+            if (typeof item == 'object') {
+                text = item.map((txt, idx) => (
+                    <TSpan
+                        key={`tpan_${i}_${idx}`}
+                        x={(i * stepX) + margin.left}
+                        y={-(margin.bottom - 15) + idx * 12}
+                    >
+                        {txt}
+                    </TSpan>
+                ));
+            };
             if (i != length && (i == 0 || (i % each == 0)))
-                return <Text key={"axislabel_" + i} fill={colors.axisTextColor} stroke="none" fontSize="12" fontWeight="normal" x={(i * stepX) + margin.left} y={-(margin.bottom - 15)} textAnchor="middle">{item}</Text>
+                return <Text key={"axislabel_" + i} fill={colors.axisTextColor} fontSize="12" fontWeight="normal" x={(i * stepX) + margin.left} y={-(margin.bottom - 15)} textAnchor="middle">{text}</Text>
         });
 
         return (

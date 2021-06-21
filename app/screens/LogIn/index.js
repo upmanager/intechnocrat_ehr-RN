@@ -21,9 +21,6 @@ class LogIn extends Component {
   constructor(props) {
     super(props);
   }
-  componentDidMount() {
-
-  }
   setValidateState(item) {
     this.setState({
       validate: {

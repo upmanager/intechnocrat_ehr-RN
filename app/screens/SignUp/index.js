@@ -1,7 +1,7 @@
 import * as reduxActions from "@actions";
 import { BaseConfig, BaseColor } from "@config";
 import React, { Component } from "react";
-import { View, TouchableOpacity, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
 import { Button, Input, Icon, CheckBox, ButtonGroup } from 'react-native-elements';
 import { connect } from "react-redux";
 import styles from "./styles";
@@ -208,7 +208,7 @@ class LogIn extends Component {
           onPressLeft={this.onBack.bind(this)}
 
         />
-        <Carousel
+     <Carousel
           ref={(c) => { this._carousel = c; }}
           data={[this.renderAuth.bind(this), this.renderProfile.bind(this), this.renderTerms.bind(this)]}
           renderItem={({ item, index }) => item()}

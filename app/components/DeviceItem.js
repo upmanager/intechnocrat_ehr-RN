@@ -10,7 +10,7 @@ export default class DeviceItem extends Component {
             <View style={styles.container}>
                 <Text> {name} </Text>
                 <Image
-                    source={{ uri: image }}
+                    source={typeof image == "string" ? { uri: image } : image}
                     style={{ width: 80, height: 60, marginTop: 10 }}
                     resizeMode={'cover'}
                     PlaceholderContent={<ActivityIndicator />}
@@ -24,9 +24,10 @@ const styles = StyleSheet.create({
         backgroundColor: BaseColor.whiteColor,
         borderRadius: 8,
         flex: 1,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        margin: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginHorizontal: 10,
+        marginVertical: 5,
         shadowColor: BaseColor.blackColor,
         shadowOffset: {
             width: 0,

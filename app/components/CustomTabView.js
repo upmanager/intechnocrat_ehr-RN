@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
-import { View } from 'react-native'
-import Carousel from 'react-native-snap-carousel';
-import { getDeviceWidth } from "@utils";
-import { ButtonGroup } from 'react-native-elements';
 import { BaseColor } from "@config";
+import { getDeviceWidth } from "@utils";
+import React, { Component } from 'react';
+import { ButtonGroup } from 'react-native-elements';
+import Carousel from 'react-native-snap-carousel';
 
 export default class CustomTabView extends Component {
     state = {
@@ -29,7 +28,7 @@ export default class CustomTabView extends Component {
     render() {
         const { curIndex } = this.state;
         return (
-            <View>
+            <>
                 <ButtonGroup
                     onPress={this.onChangeTab.bind(this)}
                     selectedIndex={curIndex}
@@ -47,7 +46,7 @@ export default class CustomTabView extends Component {
                     data={this.getData(1)}
                     renderItem={({ item, index }) => item}
                 />
-            </View>
+            </>
         )
     }
 }

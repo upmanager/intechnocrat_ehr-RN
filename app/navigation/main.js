@@ -4,12 +4,33 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Account from "@screens/Account";
 import Devices from "@screens/Devices";
 import Summary from "@screens/Summary";
+import AddDevice from "@screens/AddDevice";
+import Global from "@screens/Global";
+import Units from "@screens/Units";
+import Profile from "@screens/Profile";
+import About from "@screens/About";
 import React from "react";
 import { Icon } from 'react-native-elements';
 import { connect } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const horizontalAnimation = {
+  cardStyleInterpolator: ({ current, layouts }) => {
+    return {
+      cardStyle: {
+        transform: [
+          {
+            translateX: current.progress.interpolate({
+              inputRange: [0, 1],
+              outputRange: [layouts.screen.width, 0],
+            }),
+          },
+        ],
+      },
+    };
+  },
+};
 const TabNavigator = (props) => {
   return (
     <Tab.Navigator>
@@ -53,6 +74,12 @@ export default function Navigation() {
           headerShown: false,
         }}>
         <Stack.Screen name="TabNavigator" component={TabNavigatorComponent} />
+        <Stack.Screen name="AddDevice" component={AddDevice} options={horizontalAnimation} />
+        <Stack.Screen name="Global" component={Global} options={horizontalAnimation} />
+        <Stack.Screen name="Units" component={Units} options={horizontalAnimation} />
+        <Stack.Screen name="About" component={About} options={horizontalAnimation} />
+        <Stack.Screen name="Profile" component={Profile} options={horizontalAnimation} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   )

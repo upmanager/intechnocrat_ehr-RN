@@ -3,3 +3,6 @@
 export const GETUSERSUCCESS = "GETUSERSUCCESS";
 export const GETUSERFAILED = "GETUSERFAILED";
 export const LOADING = "LOADING";
+
+
+export const UPDATEUNITS = "UPDATEUNITS";

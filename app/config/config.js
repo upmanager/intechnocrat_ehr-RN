@@ -5,3 +5,25 @@ export const FORGOTPASSWORDLINK = `https://cloud.ihealthlabs.com/UserAuthWeb/pas
 export const CLIENTID = 'b619c60bdc7942d693f14d1d8cda16f3';
 export const CLIENTSECURITY = '9a41ec10e873496791bd331525b2f457';
 export const IHEALTHAPIURL = 'https://api.ihealthlabs.com:8443/OpenApiV2/';
+export const UNITS = {
+    bp: [
+        { unit: "mmHg" },
+        { unit: "kPa" }
+    ],
+    weight: [
+        { unit: "kg" },
+        { unit: "lbs" }
+    ],
+    distance: [
+        { unit: "km" },
+        { unit: "miles" }
+    ],
+    height: [
+        { unit: "cm" },
+        { unit: "feet" }
+    ],
+    temperature: [
+        { unit: "°C" },
+        { unit: "°F" }
+    ],
+}

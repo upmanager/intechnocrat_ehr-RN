@@ -7,7 +7,7 @@ export default class Header extends Component {
     render() {
         const { renderLeft, renderRight, renderCenter, title, onPressLeft, onPressRight } = this.props;
         return (
-            <View style={[styles.container, renderCenter && { paddingTop: 20 }]}>
+            <View style={styles.container}>
                 <View style={styles.action}>
                     {renderLeft && (
                         <TouchableOpacity onPress={onPressLeft}>
@@ -36,9 +36,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         backgroundColor: BaseColor.primaryColor,
         padding: 10,
-        paddingTop: 50,
+        paddingTop: 10,
     },
     action: {
-        width: 50,
+        width: 20,
     }
 });

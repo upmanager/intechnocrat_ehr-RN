@@ -6,7 +6,8 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: BaseColor.whiteColor
+    backgroundColor: BaseColor.whiteColor,
+    paddingTop:20,
   },
   contain: {
     flex: 1,
