@@ -1,30 +1,32 @@
 import * as reduxActions from "@actions";
-import { BaseConfig, BaseColor } from "@config";
-import React, { Component } from "react";
-import { View, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
-import { Button, Input, Icon, CheckBox, ButtonGroup } from 'react-native-elements';
-import { connect } from "react-redux";
-import styles from "./styles";
-import { PasswordInput, Header, Text } from "@components";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { Header, PasswordInput, Text } from "@components";
+import { BaseColor } from "@config";
+import { getDeviceWidth } from "@utils";
 import moment from "moment";
-import { ActivityIndicator } from "react-native";
+import React, { Component } from "react";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import { Button, ButtonGroup, CheckBox, Icon, Input } from 'react-native-elements';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Toast from 'react-native-simple-toast';
 import Carousel from 'react-native-snap-carousel';
-import { getDeviceWidth } from "@utils";
+import { connect } from "react-redux";
+import styles from "./styles";
 
 class LogIn extends Component {
   state = {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    receive_newsletter: false,
+    email: 'test@gmail.com',
+    password: '1234',
+    confirmPassword: '1234',
+    firstname: 'test',
+    lastname: 'user',
     validate: {
       email: true,
       password: true,
       confirm_password: true,
       show_password: false,
       show_confirm_password: false,
+      firstname: true,
+      lastname: true
     },
     gender: 0,
     visible_datepicker: false,
@@ -35,12 +37,6 @@ class LogIn extends Component {
   curIndex = 0;
   constructor(props) {
     super(props);
-  }
-  componentDidMount() {
-    // this.swiper.scrollBy(2, true);
-    // setTimeout(() => {
-    //   this.setState({ email: "Adsf" })
-    // }, 2000);
   }
   setValidateState(item) {
     this.setState({
@@ -53,13 +49,15 @@ class LogIn extends Component {
   next() {
     if (this._carousel.currentIndex == 0) {
       const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-      const { email, password, confirmPassword } = this.state;
+      const { email, password, confirmPassword, firstname, lastname } = this.state;
       this.setValidateState({
         email: reg.test(email),
         password: !!password,
-        confirm_password: password == confirmPassword
+        confirm_password: password == confirmPassword,
+        firstname: !!firstname,
+        lastname: !!lastname
       })
-      if (!reg.test(email) || !password || password != confirmPassword) {
+      if (!reg.test(email) || !password || password != confirmPassword || !firstname || !lastname) {
         return;
       }
     }
@@ -73,15 +71,27 @@ class LogIn extends Component {
     }
   }
   renderAuth() {
-    const { email, password, confirmPassword, validate, receive_newsletter } = this.state;
+    const { email, password, confirmPassword, validate, firstname, lastname } = this.state;
     return (
       <View style={styles.contain}>
-        <Text title1 blackColor flexCenter>Enter email and password</Text>
+        <Text title1 blackColor flexCenter>Enter your detail</Text>
+        <Input
+          placeholder='First Name'
+          value={firstname}
+          errorMessage={validate.firstname ? '' : 'Please input your first name'}
+          containerStyle={{ marginTop: 30 }}
+          onChangeText={firstname => this.setState({ firstname })}
+        />
+        <Input
+          placeholder='Last Name'
+          value={lastname}
+          errorMessage={validate.lastname ? '' : 'Please input your last name'}
+          onChangeText={lastname => this.setState({ lastname })}
+        />
         <Input
           placeholder='Email'
           value={email}
           errorMessage={validate.email ? '' : 'Please input valid email'}
-          containerStyle={{ marginTop: 30 }}
           onChangeText={email => this.setState({ email })}
         />
         <Input
@@ -110,17 +120,13 @@ class LogIn extends Component {
           onChangeText={confirmPassword => this.setState({ confirmPassword })}
         />
         <View style={{ flex: 1 }} />
-        <CheckBox
-          title='I agree to receive the iHealth newsletter'
-          checked={receive_newsletter}
-          onPress={() => this.setState({ receive_newsletter: !receive_newsletter })}
-        />
+
 
         <Button
-          title="Next"
+          title="Create"
           buttonStyle={styles.actions}
           containerStyle={styles.m_10}
-          disabled={!email || !password || !confirmPassword || password != confirmPassword || !receive_newsletter}
+          disabled={!email || !password || !confirmPassword || password != confirmPassword || !firstname || !lastname}
           onPress={this.next.bind(this)}
         />
       </View>
@@ -164,17 +170,23 @@ class LogIn extends Component {
     );
   }
   register() {
-    Toast.showWithGravity('Successfully registerd.', Toast.SHORT, Toast.TOP);
-    this.setState({ registering: false });
-    setTimeout(() => {
-      this.props.navigation.navigate("LogIn");
-    }, 1000);
+    this.setState({ registering: true });
+    this.props.register(this.state, res => {
+      this.setState({ registering: false });
+      if (res.success) {
+        Toast.showWithGravity(res.WelcomeMessage, Toast.SHORT, Toast.TOP);
+        this.props.navigation.navigate("LogIn");
+      } else {
+        Toast.showWithGravity(res.FailedMessage || 'Register failed, please try again later.', Toast.SHORT, Toast.TOP);
+      }
+    })
   }
   renderTerms() {
-    const { agree_terms } = this.state;
+    const { agree_terms, registering } = this.state;
     return (
       <View style={{ flex: 1 }}>
-        <ScrollView>
+        <ScrollView style={{ padding: 20 }}>
+          <Text primaryColor title2>Terms and Conditions</Text>
           <Text numberOfLines={9999999}>
             These General terms of use (hereinafter the “Terms”) are signed between the company IHEALTHLABS US (hereinafter “iHealth”) and any third-party developer (hereinafter the “Developer”) wishing to use the iHealth Application Programming Interface (hereinafter the “API”) in order to develop third party applications intended for users of the iHealth products and services (hereinafter the “Users”).
             Use of the API is subject to strict compliance with these Terms, which the Developer must first have reviewed and accepted.
@@ -183,7 +195,7 @@ class LogIn extends Component {
           </Text>
         </ScrollView>
         <CheckBox
-          title={`By registering an iHealth account, you have read and agreed with iHealth's Terms of Use and Privacy Policies`}
+          title={`Agree terms and conditions`}
           checked={agree_terms}
           containerStyle={styles.m_10}
           onPress={() => this.setState({ agree_terms: !agree_terms })}
@@ -192,6 +204,7 @@ class LogIn extends Component {
           title="Ok"
           buttonStyle={styles.actions}
           disabled={!agree_terms}
+          loading={registering}
           containerStyle={styles.m_20}
           onPress={this.register.bind(this)}
         />
@@ -206,24 +219,18 @@ class LogIn extends Component {
           title={'Create account'}
           renderLeft={<Icon name={'angle-left'} color={BaseColor.whiteColor} size={30} type={'font-awesome'} />}
           onPressLeft={this.onBack.bind(this)}
-
+          loading={registering}
         />
-     <Carousel
+        <Carousel
           ref={(c) => { this._carousel = c; }}
-          data={[this.renderAuth.bind(this), this.renderProfile.bind(this), this.renderTerms.bind(this)]}
+          // this.renderProfile.bind(this), 
+          data={[this.renderAuth.bind(this), this.renderTerms.bind(this)]}
           renderItem={({ item, index }) => item()}
           sliderWidth={getDeviceWidth()}
           itemWidth={getDeviceWidth()}
           scrollEnabled={false}
           currentScrollPosition={2}
         />
-        {registering &&
-          <View style={{ align: "center", flex: 1, position: "absolute", justifyContent: "center" }}>
-            <View style={{ backgroundColor: "#00000099", padding: 30, borderRadius: 12 }}>
-              <ActivityIndicator size={'large'} color={BaseColor.whiteColor} />
-            </View>
-          </View>
-        }
         <DateTimePickerModal
           isVisible={visible_datepicker}
           mode="date"

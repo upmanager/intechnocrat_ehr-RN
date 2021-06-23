@@ -1,5 +1,5 @@
 import {
-    GETUSERFAILED, GETUSERSUCCESS, UPDATEUSER
+    GETUSERFAILED, GETUSERSUCCESS, UPDATEUSER, LOGOUT
 } from "@constants";
 const initialState = {
     user: {},
@@ -12,7 +12,8 @@ export default (state = initialState, action = {}) => {
         case GETUSERSUCCESS:
             return { ...state, ...action.data };
         case GETUSERFAILED:
-            return { ...state, user: [] };
+        case LOGOUT:
+            return { ...state, user: [], token: null, login: false };
         case UPDATEUSER:
             return { ...state, user: { ...state.user, ...action.data } };
         default:

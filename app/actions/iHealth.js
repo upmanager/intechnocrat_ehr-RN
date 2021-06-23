@@ -1,47 +1,46 @@
 import { DeviceEventEmitter } from 'react-native';
-import { iHealthDeviceManagerModule } from '@ihealth/ihealthlibrary-react-native';
-// export const healthDeviceEmitter = () => dispatch => {
-//     DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Connected, res => {
-//         console.log("Event_Device_Connected", res);
-//     });
-//     DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Connect_Failed, res => {
-//         console.log("Event_Device_Connect_Failed", res);
-//     });
-//     DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Disconnect, res => {
-//         console.log("Event_Device_Disconnect", res);
-//     });
-//     DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Authenticate_Result, res => {
-//         console.log("Event_Authenticate_Result", res);
-//         iHealthDeviceManagerModule.authenAppSecret('9a41ec10e873496791bd331525b2f457', res => {
-//             console.log("security res", res);
-//         })
-//     });
-// }
-const deviceLinster = (type, callback) => {
+import {
+    HS2SModule,
+    iHealthDeviceManagerModule,
+} from '@ihealth/ihealthlibrary-react-native';
+import HS2SEvents from "./iHealth/scale/HS2S";
+
+export const startDiscover = (type, callback) => {
     DeviceEventEmitter.removeAllListeners();
-    DeviceEventEmitter.addListener(type, res => {
-        console.log(type, res);
-        callback(res);
-        DeviceEventEmitter.removeAllListeners();
-    });
+    DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Scan_Device, callback);
+    DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Scan_Finish, callback);
+    iHealthDeviceManagerModule.startDiscovery(type);
 }
-const emitterTimeout = (callback) => {
-    setTimeout(() => {
-        callback("timeout");
-    }, 60000);
+export const stopDiscover = () => {
+    iHealthDeviceManagerModule.stopDiscovery();
 }
-export const startDiscover = (...params) => {
+export const authenConfigureInfo = (userName, clientID, clientSecret) => {
     return new Promise((resolve, reject) => {
-        deviceLinster(iHealthDeviceManagerModule.Event_Scan_Device, reject);
-        deviceLinster(iHealthDeviceManagerModule.Event_Scan_Finish, resolve);
-        emitterTimeout(reject);
-        iHealthDeviceManagerModule.startDiscovery(...params);
+        DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Authenticate_Result, resolve);
+        iHealthDeviceManagerModule.authenConfigureInfo(userName, clientID, clientSecret);
     });
 }
-export const authenConfigureInfo = (...params) => {
+export const connectDevice = (mac, type) => {
     return new Promise((resolve, reject) => {
-        deviceLinster(iHealthDeviceManagerModule.Event_Authenticate_Result, resolve);
-        emitterTimeout(reject);
-        iHealthDeviceManagerModule.authenConfigureInfo(...params);
+        DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Connected, resolve);
+        DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Connect_Failed, reject);
+        iHealthDeviceManagerModule.connectDevice(mac, type);
     });
+}
+export const disconnectDevice = (mac, type) => {
+    return new Promise((resolve, reject) => {
+        DeviceEventEmitter.addListener(iHealthDeviceManagerModule.Event_Device_Disconnect, resolve);
+        iHealthDeviceManagerModule.disconnectDevice(mac, type);
+    });
+}
+export const startMeasure = ({ mac, type }) => {
+    HS2SModule.measure(mac, 0, "0", 0, 0, 0, 0, 0, 0, 0);
+}
+export const deviceEmitter = (type, callback) => {
+    switch (type) {
+        case "HS2S":
+            return HS2SEvents(callback);
+        default:
+            break;
+    }
 }

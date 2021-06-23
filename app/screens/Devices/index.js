@@ -7,14 +7,14 @@ import { FlatList, RefreshControl, View } from 'react-native';
 import { Avatar, Button, Icon } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
+import { Images } from "@assets";
 import styles from './styles';
-
 export class index extends Component {
   addNewDevice() {
     this.props.navigation.navigate("AddDevice");
   }
   onDevicePress(device) {
-    console.log(device);
+    this.props.navigation.navigate("ConnectDevice", { device });
   }
   getData(_H) {
     const { auth: { user: { height, weight } }, units: { height: height_units, weight: weight_units } } = this.props;
@@ -39,7 +39,7 @@ export class index extends Component {
                 <Avatar
                   rounded
                   size={'xlarge'}
-                  source={{ uri: user.avatar }}
+                  source={user.avatar ? { uri: user.avatar } : Images.def_avatar}
                 />
               </View>
               <View style={styles.headerDetail}>

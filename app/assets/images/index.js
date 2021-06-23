@@ -4,7 +4,7 @@
  */
 export const Images = {
   logo: require("./logo.png"),
-  
+  def_avatar: require("./default.png"),
   // glucometer
   glucometer: require("./glucometer.png"),
   align_bg1: require("./align_bg1.png"),
@@ -33,7 +33,9 @@ export const Images = {
   setup_hs2_1: require("./setup_hs2_1.png"),
   setup_hs2_2: require("./setup_hs2_2.png"),
   setup_scan_qrcode: require("./setup_scan_qrcode.png"),
-
+  // connect
+  connect_success: require("./connect_success.png"),
+  connecting: require("./connecting.png"),
   // wave wireless activity tracker
   wave: require("./wave.png"),
   edge_am3s: require("./edge_am3s.png"),

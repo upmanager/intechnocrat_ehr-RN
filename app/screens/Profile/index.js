@@ -10,6 +10,7 @@ import { BaseColor, BaseConfig } from "@config";
 import moment from "moment";
 import { convertUnits } from "@utils";
 import ImagePicker from 'react-native-image-crop-picker';
+import { Images } from "@assets";
 
 const _UPDATEKEYS = [
   'name', 'avatar', 'email', 'gender', 'height', 'weight', 'birthday', 'region', 'athlete', 'daily_activity'
@@ -255,23 +256,24 @@ export class index extends Component {
   render() {
     const { auth: { user } } = this.props;
     const { bottomSheet, saved, update_avatar, avatar, saving } = this.state;
+    const username = `${user.userFirstName} ${user.userMiddleName} ${user.userLastName}` || "User";
     return (
       <SafeAreaView style={styles.container}>
         <Header
-          saving={saving}
+          loading={saving}
           renderCenter={
             <View style={styles.headerContain}>
               <View style={styles.headerAvatar}>
                 <Avatar
                   rounded
                   size={'large'}
-                  source={{ uri: user.avatar || '' }}
-                  title={user.name?.slice(0, 2) || "Avatar"}
+                  source={user.avatar ? { uri: user.avatar } : Images.def_avatar}
+                  title={username?.slice(0, 2) || "Avatar"}
                 >
                   <Avatar.Accessory size={30} onPress={this.toggleUpdateAvatar.bind(this)} />
                 </Avatar>
               </View>
-              <Text whiteColor headline> {user.name} </Text>
+              <Text whiteColor headline> {username} </Text>
             </View>
           }
 
@@ -323,8 +325,8 @@ export class index extends Component {
             <Avatar
               rounded
               size={'xlarge'}
-              source={{ uri: update_avatar.avatar?.path || avatar || '' }}
-              title={user.name?.slice(0, 2) || "Avatar"}
+              source={(update_avatar.avatar?.path || avatar) ? { uri: update_avatar.avatar?.path || avatar } : Images.def_avatar}
+              title={username?.slice(0, 2) || "Avatar"}
             />
           </View>
           {update_avatar.avatar ?

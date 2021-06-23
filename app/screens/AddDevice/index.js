@@ -1,166 +1,18 @@
 import * as reduxActions from "@actions";
 import { Images } from "@assets";
 import { Header, Text } from "@components";
-import { BaseColor } from "@config";
+import { BaseColor, BaseConfig, IHEALTHDEVICES } from "@config";
 import { getDeviceWidth } from "@utils";
 import React, { Component } from 'react';
-import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native';
-import { Button, Icon, Image } from "react-native-elements";
+import { ActivityIndicator, FlatList, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Button, Icon, Image, Overlay } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import styles from './styles';
 
 const { iHealth } = reduxActions;
-const data = [
-  {
-    id: 1,
-    title: "Smart Wireless Glucometer",
-    image: Images.glucometer,
-    devices: [
-      // {
-      //   id: 1,
-      //   title: "Align (BG1)",
-      //   image: Images.align_bg1,
-      //   device: 'BG1',
-      // },
-      {
-        id: 2,
-        title: "Gluco (BG5)",
-        image: Images.gluco_bg5,
-        device: 'BG5'
-      },
-      {
-        id: 3,
-        title: "Gluco+ (BG5S)",
-        image: Images.gluco_bg5s,
-        device: 'BG5S'
-      },
-    ]
-  },
-  {
-    id: 2,
-    title: "Track Wireless BP Monitor",
-    image: Images.bp_monitor,
-    devices: [
-      {
-        id: 1,
-        title: "Ease (BP3L)",
-        image: Images.ease_bp3l,
-        device: 'BP3L',
-        setup_guide: [
-          {
-            description: 'Make sure your device is fully charged',
-            image: Images.setup_bp3l,
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Feel (BP5)",
-        image: Images.feel_bp5,
-        device: 'BP5',
-        setup_guide: [
-          {
-            description: `Press 'START' or 'M' button on the iHealth Neo to turn on the Bluetooth. The bluetooth LED will be flashing.`,
-            image: Images.setup_bp5,
-          }
-        ]
-      },
-      {
-        id: 3,
-        title: "NEO (BP5S)",
-        image: Images.neo_bp5s,
-        device: 'BP5S',
-        setup_guide: [
-          {
-            description: `Press 'START' or 'M' button on the iHealth Neo to turn on the Bluetooth. The bluetooth LED will be flashing.`,
-            image: Images.setup_bp5s,
-          }
-        ]
-      },
-      {
-        id: 4,
-        title: "View (BP7S)",
-        image: Images.view_bp7s,
-        device: 'BP7S'
-      }
-    ]
-  },
-  {
-    id: 3,
-    title: "Wireless Body Composition Scale",
-    image: Images.diagonal,
-    devices: [
-      {
-        id: 1,
-        title: "Lina (HS2)",
-        image: Images.lina_hs2,
-        device: 'HS2',
-        setup_guide: [
-          {
-            description: `Install batteries.`,
-            image: Images.setup_hs2_1,
-          },
-          {
-            description: `Please tap the right bottom corner of your scale to turn it on. Make sure 0.0 appear on the scale`,
-            image: Images.setup_hs2_2,
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Lite (HS4S)",
-        image: Images.lite_hs4s,
-        device: 'HS4S',
-        setup_guide: [
-          {
-            description: `Install batteries.`,
-            image: Images.setup_hs2_1,
-          }
-        ]
-      },
-      {
-        id: 3,
-        title: "Fit/Nexus (HS2S)",
-        image: Images.fit_nexus_hs2s,
-        device: 'HS2S',
-        setup_guide: [
-          {
-            description: `Install batteries.`,
-            image: Images.setup_hs2_1,
-          }
-        ]
-      },
-      {
-        id: 4,
-        title: "Core (HS6)",
-        image: Images.core_hs6,
-        device: 'HS6', // no eixt
-        scanQRcode: true
-      }
-    ]
-  },
-  {
-    id: 4,
-    title: "Wave Wireless Activity Tracker",
-    image: Images.wave,
-    devices: [
-      {
-        id: 1,
-        title: "Edge (AM3S)",
-        image: Images.align_bg1,
-        device: 'AM3S'
-      },
-      {
-        id: 2,
-        title: "Wav e (AM4)",
-        image: Images.gluco_bg5,
-        device: 'AM4'
-      }
-    ]
-  },
-];
+
 const connection_guide = {
   title: "Not working? You can try the following.",
   setps: [
@@ -173,8 +25,20 @@ const connection_guide = {
 
 export class index extends Component {
   state = {
-    curId: 0,
-    selectedDevice: '',
+    curId: 0, //3
+    selectedDevice: '',//HS4S
+    discoveredDevices: {
+      visible: false,
+      devices: []
+    }
+  }
+  componentWillUnmount() {
+    if (BaseConfig.TETSTING) {
+      try {
+        clearInterval(this.timer);
+      } catch (error) {
+      }
+    }
   }
   goBack() {
     if (this._carousel.currentIndex == 0) {
@@ -190,22 +54,50 @@ export class index extends Component {
       this._carousel.snapToNext();
     });
   }
+  selectDevice(device) {
+    iHealth.stopDiscover();
+    this.props.addDevice(device);
+    this.props.navigation.goBack();
+    this.props.navigation.navigate("ConnectDevice", { device });
+  }
   addDevice() {
     const { curId, selectedDevice } = this.state;
-    iHealth.startDiscover(selectedDevice)
-      .then(res => {
-        console.log("discover", res);
-      })
-      .catch(err => {
-        console.log("discover", err);
-      })
-      .finally(() => {
-        let cur_device = data.find(item => item.id == curId).devices.find(item => item.device == selectedDevice);
+    const device_info = IHEALTHDEVICES.find(item => item.id == curId).devices.find(item => item.device == selectedDevice);
+    if (BaseConfig.TETSTING) {
+      this.timer = setInterval(() => {
+        const { discoveredDevices: { devices } } = this.state;
         const key = `${(new Date()).getTime()}${parseInt(Math.random() * 99 + 100)}`;
-        cur_device = { ...cur_device, key };
-        this.props.addDevice(cur_device);
-        this.props.navigation.goBack();
-      });
+        const rssi = `${(new Date()).getTime()}${parseInt(Math.random() * 99 + 100)}`;
+        const res = {
+          mac: key,
+          type: selectedDevice,
+          rssi,
+          title: device_info.title,
+          image: device_info.image
+        };
+        this.setDiscoveredStates({ devices: [...devices, res], visible: true });
+        if (devices.length >= 10) {
+          clearInterval(this.timer);
+        }
+      }, 1000);
+    } else {
+      iHealth.startDiscover(selectedDevice, res => {
+        res = {
+          ...res,
+          title: device_info.title,
+          image: device_info.image
+        };
+        const { discoveredDevices: { devices } } = this.state;
+        const { devices: { devices: registerd_devices } } = this.props;
+
+        let allDevices = [...registerd_devices, ...devices];
+        if (allDevices.findIndex(item => item.mac == res.mac) >= 0) {
+          return;
+        }
+        console.log("discover", res);
+        this.setDiscoveredStates({ devices: [...devices, res], visible: true });
+      })
+    }
   }
   chooseDevice({ device }) {
     const { curId } = this.state;
@@ -233,10 +125,12 @@ export class index extends Component {
     );
   }
   renderDevicesItem({ item, index }) {
+    const disabled = item.device != "HS2S";
     return (
       <TouchableOpacity
+        disabled={disabled}
         onPress={this.chooseDevice.bind(this, item)}
-        style={styles.device_item}>
+        style={[styles.device_item, disabled && { opacity: .5 }]}>
         <Image source={item.image} style={styles.device_img} resizeMode={'cover'} />
         <Text blackColor>{item.title}</Text>
       </TouchableOpacity>
@@ -254,7 +148,7 @@ export class index extends Component {
         />
         <FlatList
           style={styles.flex}
-          data={data}
+          data={IHEALTHDEVICES}
           keyExtractor={(_, index) => index.toString()}
           renderItem={this.renderItem.bind(this)}
         />
@@ -263,7 +157,7 @@ export class index extends Component {
   }
   renderDevices() {
     const { curId } = this.state;
-    const devices = data.find(item => item.id == curId)?.devices || [];
+    const devices = IHEALTHDEVICES.find(item => item.id == curId)?.devices || [];
     return (
       <>
         <Header
@@ -295,7 +189,7 @@ export class index extends Component {
   }
   renderSetupGuide() {
     const { curId, selectedDevice } = this.state;
-    const curDevice = data.find(item => item.id == curId)?.devices?.find(item => item.device == selectedDevice) || {};
+    const curDevice = IHEALTHDEVICES.find(item => item.id == curId)?.devices?.find(item => item.device == selectedDevice) || {};
     const setup_guide = curDevice.setup_guide || [];
     const scanQRcode = curDevice.scanQRcode;
     return (
@@ -388,7 +282,20 @@ export class index extends Component {
       ];
     }
   }
+  setDiscoveredStates(item, callback) {
+    this.setState({
+      discoveredDevices: {
+        ...this.state.discoveredDevices,
+        ...item
+      }
+    }, callback);
+  }
+  toggleOverlay() {
+    const { discoveredDevices } = this.state;
+    this.setDiscoveredStates({ visible: !discoveredDevices.visible });
+  }
   render() {
+    const { discoveredDevices } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <Carousel
@@ -399,6 +306,21 @@ export class index extends Component {
           data={this.getData()}
           renderItem={({ item, index }) => item}
         />
+        <Overlay isVisible={discoveredDevices.visible} onBackdropPress={this.toggleOverlay.bind(this)} overlayStyle={{ width: "80%", padding: 20, maxHeight: "70%" }}>
+          <Text title3 blackColor bold>Select the device to connect</Text>
+          <ScrollView>
+            {discoveredDevices.devices.map((item, index) => (
+              <TouchableOpacity key={index} style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 10 }} onPress={this.selectDevice.bind(this, item)}>
+                <Image source={item.image} style={{ width: 60, height: 60, marginRight: 10 }} resizeMode={'contain'} />
+                <View >
+                  <Text headline blackColor>{item.title}</Text>
+                  <Text subhead>{item.mac}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+
+          </ScrollView>
+        </Overlay>
       </SafeAreaView>
     )
   }

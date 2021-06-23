@@ -6,7 +6,7 @@ import { LinearProgress } from 'react-native-elements';
 
 export default class Header extends Component {
     render() {
-        const { renderLeft, renderRight, renderCenter, title, onPressLeft, onPressRight, saving } = this.props;
+        const { renderLeft, renderRight, renderCenter, title, onPressLeft, onPressRight, loading } = this.props;
         return (
             <>
                 <View style={styles.container}>
@@ -29,7 +29,7 @@ export default class Header extends Component {
                         )}
                     </View>
                 </View>
-                {saving &&
+                {loading &&
                     <LinearProgress color="primary" />
                 }
             </>

@@ -1,7 +1,7 @@
 import { getDeviceWidth } from "@utils";
 import { BaseColor } from "@config";
 import { StyleSheet } from "react-native";
-const logoWidth = getDeviceWidth() * .8;
+const logoWidth = getDeviceWidth() * .9;
 export default StyleSheet.create({
   container: {
     flex: 1,
@@ -11,7 +11,7 @@ export default StyleSheet.create({
   },
   logo: {
     width: logoWidth,
-    height: 200,
+    height: 300,
   },
   loading: {
     position: "absolute",

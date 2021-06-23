@@ -18,6 +18,7 @@ class Loading extends Component {
     super(props);
   }
   componentDidMount() {
+    global.navigation = this.props.navigation;
     this.requestAndroidPermission();
     const { auth } = this.props;
     setTimeout(() => {

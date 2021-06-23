@@ -3,6 +3,7 @@
 export const GETUSERSUCCESS = "GETUSERSUCCESS";
 export const GETUSERFAILED = "GETUSERFAILED";
 export const UPDATEUSER = "UPDATEUSER";
+export const LOGOUT = "LOGOUT";
 
 // units
 export const UPDATEUNITS = "UPDATEUNITS";

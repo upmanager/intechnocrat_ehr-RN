@@ -8,7 +8,9 @@ import { Avatar, Icon } from "react-native-elements";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
+import { Images } from "@assets";
 import styles from './styles';
+import { NavigationActions } from 'react-navigation';
 
 export class index extends Component {
   renderAccountItem(icon, title, onPress, isAccount = false) {
@@ -17,7 +19,7 @@ export class index extends Component {
         style={[styles.items, isAccount && styles.account]}
         onPress={onPress}>
         {isAccount ?
-          <Avatar source={icon} rounded size={'medium'} title={title} />
+          <Avatar source={icon.uri ? icon : Images.def_avatar} rounded size={'medium'} title={title} />
           :
           <Icon name={icon.name} size={icon.size} type={icon.type} color={BaseColor.grayColor} />
         }
@@ -29,17 +31,24 @@ export class index extends Component {
   onDetail(page) {
     this.props.navigation.navigate(page);
   }
+  onLogout() {
+    this.props.logout();
+    global.navigation.navigate("Loading");
+  }
   renderAccount() {
     const { auth: { user } } = this.props;
+    const username = `${user.userFirstName} ${user.userMiddleName} ${user.userLastName}` || "User";
     return (
       <>
         <Header title={"Account"} />
-        {this.renderAccountItem({ uri: user.avatar, title: user.name?.slice(0, 2) || "Avatar" }, user.name, this.onDetail.bind(this, "Profile"), true)}
+        {this.renderAccountItem({ uri: user.avatar, title: username?.slice(0, 2) || "Avatar" }, username, this.onDetail.bind(this, "Profile"), true)}
         {this.renderAccountItem({ name: "plus", type: "evilicon", size: 24 }, "Global", this.onDetail.bind(this, "Global"))}
         {this.renderAccountItem({ name: "pencil-ruler", type: "material-community", size: 24 }, "Units", this.onDetail.bind(this, "Units"))}
         {this.renderAccountItem({ name: "infocirlceo", type: "antdesign", size: 24 }, "About", this.onDetail.bind(this, "About"))}
         <TouchableOpacity
-          style={[styles.items, { marginVertical: 15 }]}>
+          style={[styles.items, { marginVertical: 15 }]}
+          onPress={this.onLogout.bind(this)}
+        >
           <Text headline flexCenter primaryColor>Log Out</Text>
         </TouchableOpacity>
       </>

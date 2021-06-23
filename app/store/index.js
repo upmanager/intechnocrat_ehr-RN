@@ -10,7 +10,7 @@ import logger from "redux-logger";
 const persistConfig = {
   key: "MoRe",
   storage: AsyncStorage,
-  timeout: 1000
+  timeout: 10000
 };
 
 let middleware = [thunk];

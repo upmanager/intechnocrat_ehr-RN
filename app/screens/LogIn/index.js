@@ -1,20 +1,22 @@
 import * as reduxActions from "@actions";
 import { Images } from "@assets";
+import { PasswordInput, Text } from "@components";
 import { BaseConfig } from "@config";
 import React, { Component } from "react";
 import { Image as RNImage, Linking, TouchableOpacity, View } from "react-native";
 import { Button, Input } from 'react-native-elements';
+import Toast from 'react-native-simple-toast';
 import { connect } from "react-redux";
 import styles from "./styles";
-import { PasswordInput, Text } from "@components";
 
 class LogIn extends Component {
   state = {
-    email: '',
-    password: '',
+    Username: 'wkangong@itechnocrat.com',
+    Password: '123',
+    fbuser: 1,
     validate: {
-      email: true,
-      password: true,
+      Username: true,
+      Password: true,
       show_password: false
     },
     signing: false
@@ -38,45 +40,50 @@ class LogIn extends Component {
     Linking.openURL(BaseConfig.FORGOTPASSWORDLINK);
   }
   login() {
-    const { email, password } = this.state;
+    const { Username, Password } = this.state;
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     this.setValidateState({
-      email: reg.test(email),
-      password: !!password
+      Username: reg.test(Username),
+      Password: !!Password
     });
-    if (!reg.test(email) || !password) {
+    if (!reg.test(Username) || !Password) {
       return;
     }
     this.setState({ signing: true });
     this.props.login(this.state, res => {
       this.setState({ signing: false });
-      this.props.navigation.navigate("Main");
+      if (res.success) {
+        Toast.showWithGravity(res.LoginStatus || "Login success", Toast.SHORT, Toast.TOP);
+        this.props.navigation.navigate("Main");
+      } else {
+        Toast.showWithGravity(res.LoginStatus || "Login failed", Toast.SHORT, Toast.TOP);
+      }
     });
   }
   goSignUp() {
     this.props.navigation.navigate("SignUp");
   }
   render() {
-    const { email, password, validate, signing } = this.state;
+    const { Username, Password, validate, signing } = this.state;
     return (
       <View style={styles.container}>
         <View style={styles.contain}>
           <RNImage source={Images.logo} style={styles.logo} resizeMode={'contain'} />
           <Input
             placeholder='Email'
-            value={email}
-            errorMessage={validate.email ? '' : 'Please input valid email'}
-            onChangeText={email => this.setState({ email })}
+            value={Username}
+            errorMessage={validate.Username ? '' : 'Please input valid Username'}
+            onChangeText={Username => this.setState({ Username })}
           />
           <Input
             placeholder='Password'
             secureTextEntry={!validate.show_password}
-            value={password}
+            value={Password}
             isVisiblePassword={validate.show_password}
             onVisiblePassword={this.onVisiblePassword.bind(this)}
-            errorMessage={validate.password ? '' : 'Please input password'}
+            errorMessage={validate.Password ? '' : 'Please input Password'}
             InputComponent={PasswordInput}
-            onChangeText={password => this.setState({ password })}
+            onChangeText={Password => this.setState({ Password })}
           />
           <View style={{ alignItems: "flex-end" }}>
             <TouchableOpacity style={styles.p_10} onPress={this.forgotPassword.bind(this)}>
