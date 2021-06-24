@@ -5,7 +5,7 @@ export const FORGOTPASSWORDLINK = `https://cloud.ihealthlabs.com/UserAuthWeb/pas
 export const CLIENTID = 'b619c60bdc7942d693f14d1d8cda16f3';
 export const CLIENTSECURITY = '9a41ec10e873496791bd331525b2f457';
 export const IHEALTHAPIURL = 'https://api.ihealthlabs.com:8443/OpenApiV2/';
-export const TETSTING = true;
+export const TETSTING = false;
 export const UNITS = {
     bp: [
         { unit: "mmHg", default: true },
