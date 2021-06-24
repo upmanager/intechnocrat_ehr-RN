@@ -36,10 +36,10 @@ export const disconnectDevice = (mac, type) => {
 export const startMeasure = ({ mac, type }) => {
     HS2SModule.measure(mac, 0, "0", 0, 0, 0, 0, 0, 0, 0);
 }
-export const deviceEmitter = (type, callback) => {
+export const deviceEmitter = (type, eventType, callback) => {
     switch (type) {
         case "HS2S":
-            return HS2SEvents(callback);
+            return HS2SEvents(eventType, callback);
         default:
             break;
     }

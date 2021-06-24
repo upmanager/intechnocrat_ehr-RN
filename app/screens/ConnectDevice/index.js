@@ -16,7 +16,8 @@ const _CONNECTION_STATE = {
 }
 export class index extends Component {
   state = {
-    connection_state: _CONNECTION_STATE.CONNECTING
+    connection_state: _CONNECTION_STATE.CONNECTING,
+    result: null
   }
   constructor(props) {
     super(props);
@@ -50,8 +51,9 @@ export class index extends Component {
   connectedDevice(data) {
     console.log("connected", data);
     this.setState({ connection_state: _CONNECTION_STATE.CONNECTED });
-    iHealth.deviceEmitter(this.params.device.type, res => {
-      console.log(res);
+    iHealth.deviceEmitter(this.params.device.type, "history_data", result => {
+      console.log(result);
+      this.setState({ result })
     })
     iHealth.startMeasure(this.params.device);
   }
@@ -59,7 +61,7 @@ export class index extends Component {
     this.props.navigation.goBack();
   }
   render() {
-    const { connection_state } = this.state;
+    const { connection_state, result } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <Header
@@ -103,9 +105,10 @@ export class index extends Component {
           containerStyle={{ marginBottom: 60 }}
           buttonStyle={{ paddingHorizontal: 60, paddingVertical: 10 }}
           title="History Data    "
-          icon={<Icon name={'settings'} type={'octicon'} color={BaseColor.primaryColor} size={20} color={BaseColor.primaryColor} />}
+          icon={<Icon name={'settings'} type={'octicon'} color={result ? BaseColor.primaryColor : BaseColor.grayColor} size={20} />}
           iconPosition={'right'}
           type={'outline'}
+          disabled={!result}
         />
       </SafeAreaView>
     )

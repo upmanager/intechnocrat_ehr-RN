@@ -3,10 +3,39 @@ import {
     HS2SModule,
     HS2SProfileModule,
 } from '@ihealth/ihealthlibrary-react-native';
-
-export default (callback) => {
+import { BaseConfig } from "@config";
+export default (eventtype, callback) => {
+    if (BaseConfig.TETSTING) {
+        const result = {
+            fat_weight: 100,
+            fat_control: "",
+            weight_control: "",
+            standard_weight: "",
+            skeletal_muscle_mass: "",
+            body_water_rate: 50,
+            muscle_mas: "",
+            instruction_type: "",
+            body_building: 7.9,
+            height: "",
+            gender: "",
+            muscle_control: "",
+            physical_age: "",
+            visceral_fat_grade: "",
+            protein_rate: "",
+            bone_salt_content: "",
+            measure_time: "",
+            age: "",
+            impedance: "",
+            weight: 188
+        }
+        setTimeout(() => {
+            callback(result);
+        }, 3000);
+        return;
+    }
     DeviceEventEmitter.addListener(HS2SModule.Event_Notify, event => {
         let data = {};
+        if (eventtype && event.action != eventtype) return;
         switch (event.action) {
             case HS2SProfileModule.ACTION_GET_DEVICE_INFO:
                 data = {
@@ -33,14 +62,14 @@ export default (callback) => {
                     user_infos: event[HS2SProfileModule.USER_INFO_ARRAY],
                 };
                 // let array = event[HS2SProfileModule.USER_INFO_ARRAY];
-                // console.log(array["body_building"]);
-                // console.log(array["impedance"]);
-                // console.log(array["height"]);
-                // console.log(array["age"]);
-                // console.log(array["gender"]);
-                // console.log(array["weight"]);
-                // console.log(array["create_time"]);
-                // console.log(array["user_id"]);
+                // console.log(array["body_building:""
+                // console.log(array["impedance:""
+                // console.log(array["height:""
+                // console.log(array["age:""
+                // console.log(array["gender:""
+                // console.log(array["weight:""
+                // console.log(array["create_time:""
+                // console.log(array["user_id:""
                 break;
             case HS2SProfileModule.ACTION_HISTORY_DATA:
                 data = {
@@ -48,27 +77,27 @@ export default (callback) => {
                 }
                 // let arr = event["history_data"];
                 // arr.forEach(function (result) {
-                //     console.log(result["fat_weight"]);
-                //     console.log(result["fat_control"]);
-                //     console.log(result["weight_control"]);
-                //     console.log(result["standard_weight"]);
-                //     console.log(result["skeletal_muscle_mass"]);
-                //     console.log(result["body_water_rate"]);
-                //     console.log(result["muscle_mas"]);
-                //     console.log(result["instruction_type"]);
-                //     console.log(result["body_building"]);
-                //     console.log(result["height"]);
-                //     console.log(result["gender"]);
-                //     console.log(result["muscle_control"]);
-                //     console.log(result["physical_age"]);
-                //     console.log(result["visceral_fat_grade"]);
-                //     console.log(result["protein_rate"]);
-                //     console.log(result["bone_salt_content"]);
-                //     console.log(result["visceral_fat_grade"]);
-                //     console.log(result["measure_time"]);
-                //     console.log(result["age"]);
-                //     console.log(result["impedance"]);
-                //     console.log(result["weight"]);
+                //     "fat_weight:""
+                //     "fat_control:""
+                //     "weight_control:""
+                //     "standard_weight:""
+                //     "skeletal_muscle_mass:""
+                //     "body_water_rate:""
+                //     "muscle_mas:""
+                //     "instruction_type:""
+                //     "body_building:""
+                //     "height:""
+                //     "gender:""
+                //     "muscle_control:""
+                //     "physical_age:""
+                //     "visceral_fat_grade:""
+                //     "protein_rate:""
+                //     "bone_salt_content:""
+                //     "visceral_fat_grade:""
+                //     "measure_time:""
+                //     "age:""
+                //     "impedance:""
+                //     "weight:""
                 // })
                 break;
             case HS2SProfileModule.ACTION_ONLINE_REAL_TIME_WEIGHT:
