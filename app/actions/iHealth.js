@@ -1,9 +1,25 @@
 import { DeviceEventEmitter } from 'react-native';
 import {
+    // scale
+    HS2Module,
     HS2SModule,
+    HS4SModule,
+
+    BG5Module,
+    BG5SModule,
+
+    BP3LModule,
+    BP5Module,
+    BP5SModule,
+
     iHealthDeviceManagerModule,
 } from '@ihealth/ihealthlibrary-react-native';
-import HS2SEvents from "./iHealth/scale/HS2S";
+import _HEALTHEVENTEMITTER from "./iHealth/index";
+import { store } from "@store";
+const AUTH_USER = (key) => {
+    if (key) return store.getState().auth.user[key];
+    return store.getState().auth.user;
+}
 
 export const startDiscover = (type, callback) => {
     DeviceEventEmitter.removeAllListeners();
@@ -34,13 +50,51 @@ export const disconnectDevice = (mac, type) => {
     });
 }
 export const startMeasure = ({ mac, type }) => {
-    HS2SModule.measure(mac, 0, "0", 0, 0, 0, 0, 0, 0, 0);
-}
-export const deviceEmitter = (type, eventType, callback) => {
+    const userid = AUTH_USER("UserProfileID");
     switch (type) {
+        case "HS2":
+            HS2Module.measureOnline(mac, 0, userid);
+            break;
         case "HS2S":
-            return HS2SEvents(eventType, callback);
+            HS2SModule.measure(mac, 0, "0", 0, 0, 0, 0, 0, 0, 0);
+            break;
+        case "HS4S":
+            HS4SModule.measureOnline(mac, 0, userid);
+            break;
+        case "BG5":
+            BG5Module.startMeasure(mac, 1);
+            break;
+        case "BG5S":
+            BG5SModule.startMeasure(mac, 1);
+            break;
+        case "BP3L":
+            BP3LModule.startMeasure(mac);
+            break;
+        case "BP5":
+            BP5Module.startMeasure(mac);
+            break;
+        case "BP5S":
+            BP5SModule.startMeasure(mac);
+            break;
         default:
             break;
     }
+}
+export const stopMeasure = ({ mac, type }) => {
+    switch (type) {
+        case "BP3L":
+            BP3LModule.stopMeasure(mac);
+            break;
+        case "BP5":
+            BP5Module.stopMeasure(mac);
+            break;
+        case "BP5S":
+            BP5SModule.stopMeasure(mac);
+            break;
+        default:
+            break;
+    }
+}
+export const deviceEmitter = (type, eventType, callback) => {
+    return _HEALTHEVENTEMITTER[type](eventType, callback);
 }

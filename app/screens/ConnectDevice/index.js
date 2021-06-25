@@ -8,6 +8,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import { Images } from "@assets";
 import styles from './styles';
+import {
+  HSProfileModule,
+  HS2SProfileModule,
+
+  BGProfileModule,
+  BG5SProfileModule,
+
+  BPProfileModule,
+} from '@ihealth/ihealthlibrary-react-native';
+
 const { iHealth } = reduxActions;
 const _CONNECTION_STATE = {
   CONNECTING: 0,
@@ -44,6 +54,9 @@ export class index extends Component {
         })
     }
   }
+  componentWillUnmount() {
+    iHealth.stopMeasure(this.params.device);
+  }
   connectFailed(err) {
     this.setState({ connection_state: _CONNECTION_STATE.DISCONNECTED })
     console.log("connect failed", err);
@@ -51,11 +64,47 @@ export class index extends Component {
   connectedDevice(data) {
     console.log("connected", data);
     this.setState({ connection_state: _CONNECTION_STATE.CONNECTED });
-    iHealth.deviceEmitter(this.params.device.type, "history_data", result => {
-      console.log(result);
-      this.setState({ result })
-    })
+    this.getEvent();
     iHealth.startMeasure(this.params.device);
+  }
+  getEvent() {
+    const { type } = this.params.device;
+    let action_event = '';
+    switch (type) {
+      // get scale
+      case "HS2":
+      case "HS4S":
+        action_event = HSProfileModule.ACTION_ONLINE_RESULT_HS;
+        break;
+      case "HS2S":
+        action_event = HS2SProfileModule.ACTION_ONLINE_RESULT;
+        break;
+      // ----- glucometer
+      case "BG5":
+        action_event = BGProfileModule.ACTION_ONLINE_RESULT_BG;
+      case "BG5S":
+        action_event = BG5SProfileModule.ACTION_ONLINE_RESULT_BG;
+        break;
+      // blood pressure
+      case "BP3L":
+      case "BP5":
+      case "BP5S":
+        action_event = BPProfileModule.ACTION_ONLINE_PRESSURE_BP;
+        break;
+
+      default:
+        break;
+    }
+    iHealth.deviceEmitter(type, HS2SProfileModule.ACTION_ONLINE_RESULT, result => {
+      if (type in ["HS2", "HS4S", "HS2S"]) {
+        this.props.setWeight(result?.weight || 0);
+      } else if (type in ["BG5", "GB5S"]) {
+        console.log("glucometer", result);
+      } else if (type in ["BP3L", "BP5", "BP5S"]) {
+        console.log("set bp", result);
+        // this.props.setBP(result?.weight || 0);
+      }
+    })
   }
   goBack() {
     this.props.navigation.goBack();

@@ -112,12 +112,11 @@ export class index extends Component {
     });
   }
   renderItem({ item, index }) {
-    const disabled = item.id != 3;
+    if (item.hide) return null;
     return (
       <TouchableOpacity
         onPress={this.chooseCategory.bind(this, item)}
-        disabled={disabled}
-        style={[styles.device_categories, disabled && { opacity: .3 }]}>
+        style={[styles.device_categories]}>
         <Text blackColor style={{ flex: 1 }}>{item.title}</Text>
         <Image source={item.image} style={styles.category_img} resizeMode={'cover'} />
         <Icon name={'angle-right'} size={24} type={'font-awesome'} color={BaseColor.grayColor} />
@@ -125,12 +124,11 @@ export class index extends Component {
     );
   }
   renderDevicesItem({ item, index }) {
-    const disabled = item.device != "HS2S";
+    if (item.hide) return null;
     return (
       <TouchableOpacity
-        disabled={disabled}
         onPress={this.chooseDevice.bind(this, item)}
-        style={[styles.device_item, disabled && { opacity: .5 }]}>
+        style={[styles.device_item]}>
         <Image source={item.image} style={styles.device_img} resizeMode={'cover'} />
         <Text blackColor>{item.title}</Text>
       </TouchableOpacity>
@@ -306,7 +304,7 @@ export class index extends Component {
           data={this.getData()}
           renderItem={({ item, index }) => item}
         />
-        <Overlay isVisible={discoveredDevices.visible} onBackdropPress={this.toggleOverlay.bind(this)} overlayStyle={{ width: "80%", padding: 20, maxHeight: "70%" }}>
+        <Overlay isVisible={discoveredDevices.visible} onBackdropPress={() => {}} overlayStyle={{ width: "80%", padding: 20, maxHeight: "70%" }}>
           <Text title3 blackColor bold>Select the device to connect</Text>
           <ScrollView>
             {discoveredDevices.devices.map((item, index) => (

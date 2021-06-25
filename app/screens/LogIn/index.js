@@ -13,7 +13,7 @@ class LogIn extends Component {
   state = {
     Username: 'wkangong@itechnocrat.com',
     Password: '123',
-    fbuser: 1,
+    fbuser: 0,
     validate: {
       Username: true,
       Password: true,
@@ -40,7 +40,7 @@ class LogIn extends Component {
     Linking.openURL(BaseConfig.FORGOTPASSWORDLINK);
   }
   login() {
-    const { Username, Password } = this.state;
+    const { Username, Password, fbuser } = this.state;
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     this.setValidateState({
       Username: reg.test(Username),
@@ -50,7 +50,7 @@ class LogIn extends Component {
       return;
     }
     this.setState({ signing: true });
-    this.props.login(this.state, res => {
+    this.props.login({ Username, Password, fbuser }, res => {
       this.setState({ signing: false });
       if (res.success) {
         Toast.showWithGravity(res.LoginStatus || "Login success", Toast.SHORT, Toast.TOP);

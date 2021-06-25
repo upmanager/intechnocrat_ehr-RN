@@ -71,7 +71,8 @@ export default [
                 id: 4,
                 title: "View (BP7S)",
                 image: Images.view_bp7s,
-                device: 'BP7S'
+                device: 'BP7S',
+                hide: true
             }
         ]
     },
@@ -125,6 +126,7 @@ export default [
                 title: "Core (HS6)",
                 image: Images.core_hs6,
                 device: 'HS6', // no eixt
+                hide: true,
                 scanQRcode: true
             }
         ]
@@ -137,13 +139,13 @@ export default [
             {
                 id: 1,
                 title: "Edge (AM3S)",
-                image: Images.align_bg1,
+                image: Images.edge_am3s,
                 device: 'AM3S'
             },
             {
                 id: 2,
-                title: "Wav e (AM4)",
-                image: Images.gluco_bg5,
+                title: "Wave (AM4)",
+                image: Images.wave_am4,
                 device: 'AM4'
             }
         ]

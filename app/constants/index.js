@@ -11,3 +11,5 @@ export const UPDATEUNITS = "UPDATEUNITS";
 export const ADDDEVICE = "ADDDEVICE";
 export const REMOVEDEVICE = "REMOVEDEVICE";
 export const SETGLOBAL = "SETGLOBAL";
+
+export const SETWEIGHT = "SETWEIGHT";

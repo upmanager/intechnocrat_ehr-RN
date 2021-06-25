@@ -17,7 +17,7 @@ export class index extends Component {
     this.props.navigation.navigate("ConnectDevice", { device });
   }
   getData(_H) {
-    const { auth: { user: { height, weight } }, units: { height: height_units, weight: weight_units } } = this.props;
+    const { auth: { health_profile: { Height: height, WeightKg: weight } }, units: { height: height_units, weight: weight_units } } = this.props;
     const cur_unit = BaseConfig.UNITS[_H ? 'height' : 'weight'][_H ? height_units : weight_units];
     let real_height = convertUnits(_H ? height : weight, cur_unit, 1);
     if (typeof real_height == "object") {

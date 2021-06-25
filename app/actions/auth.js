@@ -6,11 +6,18 @@ import { ApiActions } from "@actions";
 
 export const login = (data, callback) => dispatch => {
     ApiActions.login(data)
-        .then(res => {
+        .then(async res => {
             const user = res.AuthenticateUserResult[0];
-            const token = String(Math.random() * 999 + 1000);
             if (user?.LoginStatus == "Login Success") {
-                dispatch({ type: GETUSERSUCCESS, data: { user, token, login: true } });
+                let health_profile = {};
+                try {
+                    health_profile = await ApiActions.getHealthUser(user.UserProfileID);
+                    health_profile = health_profile.GetUserHealthProfileResult[0] || {};
+                } catch (error) {
+                    health_profile = {};
+                }
+
+                dispatch({ type: GETUSERSUCCESS, data: { user, health_profile, login: true } });
                 callback({ ...data, success: true });
             } else {
                 throw new Error("")
