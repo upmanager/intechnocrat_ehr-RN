@@ -34,6 +34,18 @@ export class index extends Component {
     this.params = props.route.params;
   }
   componentDidMount() {
+    this.focusListener = this.props.navigation.addListener("focus", () => {
+      if (global.connected_device) {
+        this.connectedDevice(global.connected_device);
+      } else {
+        this.connectDevice();
+      }
+    })
+    this.blurListener = this.props.navigation.addListener("blur", () => {
+      this.disconnectDevice();
+    });
+  }
+  connectDevice() {
     const { device } = this.params;
     if (BaseConfig.TETSTING) {
       setTimeout(() => {
@@ -47,23 +59,29 @@ export class index extends Component {
     } else {
       iHealth.connectDevice(device.mac, device.type)
         .then(res => {
+          global.connected_device = res;
           this.connectedDevice(res);
         })
         .catch(err => {
+          global.connected_device = null;
           this.connectFailed(err);
         })
     }
   }
-  componentWillUnmount() {
+  disconnectDevice() {
     const { device } = this.params;
     iHealth.stopMeasure(device);
     iHealth.disconnectDevice(device.mac, device.type)
       .then(res => {
+        global.connected_device = null;
         console.log("disconnected", res);
       })
       .catch(err => {
         console.error("disconnected", err);
       })
+  }
+  componentWillUnmount() {
+    this.disconnectDevice();
   }
   connectFailed(err) {
     this.setState({ connection_state: _CONNECTION_STATE.DISCONNECTED })
