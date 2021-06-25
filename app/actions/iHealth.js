@@ -52,7 +52,8 @@ export const disconnectDevice = (mac, type) => {
 }
 export const startMeasure = ({ mac, type }) => {
     const userid = AUTH_USER("UserProfileID");
-    const str_userid = (`${userid}_${Math.random() * 99999999 + 100000000}`).substr(0, 17);
+    const str_userid = (`${userid}_${Math.random() * 99999999 + 100000000}`).substr(0, 16);
+    console.log("str", str_userid, str_userid.length);
     switch (type) {
         case "HS2":
             HS2Module.measureOnline(mac, 0, str_userid);

@@ -82,8 +82,8 @@ export class index extends Component {
   }
   componentWillUnmount() {
     this.disconnectDevice();
-    this.focusListener.remove();
-    this.blurListener.remove();
+    this.focusListener?.remove?.();
+    this.blurListener?.remove?.();
   }
   connectFailed(err) {
     this.setState({ connection_state: _CONNECTION_STATE.DISCONNECTED })
