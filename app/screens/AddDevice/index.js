@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Carousel from 'react-native-snap-carousel';
 import { connect } from 'react-redux';
 import styles from './styles';
+import Toast from 'react-native-simple-toast';
 
 const { iHealth } = reduxActions;
 
@@ -30,7 +31,8 @@ export class index extends Component {
     discoveredDevices: {
       visible: false,
       devices: []
-    }
+    },
+    searching: true
   }
   componentWillUnmount() {
     if (BaseConfig.TETSTING) {
@@ -39,12 +41,17 @@ export class index extends Component {
       } catch (error) {
       }
     }
+    iHealth.stopDiscover();
   }
   goBack() {
     if (this._carousel.currentIndex == 0) {
       this.props.navigation.goBack();
     } else {
       this._carousel.snapToPrev();
+    }
+    try {
+      iHealth.stopDiscover();
+    } catch (error) {
     }
   }
   chooseCategory({ id }) {
@@ -62,6 +69,7 @@ export class index extends Component {
   }
   addDevice() {
     const { curId, selectedDevice } = this.state;
+    this.setState({ searching: true });
     const device_info = IHEALTHDEVICES.find(item => item.id == curId).devices.find(item => item.device == selectedDevice);
     if (BaseConfig.TETSTING) {
       this.timer = setInterval(() => {
@@ -82,6 +90,15 @@ export class index extends Component {
       }, 1000);
     } else {
       iHealth.startDiscover(selectedDevice, res => {
+        console.log("discover", res);
+        if (!res) {
+          if (this.state.discoveredDevices?.devices?.length > 0) {
+          } else {
+            Toast.showWithGravity("Can't find deivce!", Toast.SHORT, Toast.TOP);
+          }
+          this.setState({ searching: false });
+          return;
+        }
         res = {
           ...res,
           title: device_info.title,
@@ -94,7 +111,6 @@ export class index extends Component {
         if (!res.mac || allDevices.findIndex(item => item.mac == res.mac) >= 0) {
           return;
         }
-        console.log("discover", res);
         this.setDiscoveredStates({ devices: [...devices, res], visible: true });
       })
     }
@@ -232,6 +248,7 @@ export class index extends Component {
     )
   }
   renderConnection() {
+    const { searching } = this.state;
     return (
       <>
         <Header
@@ -252,12 +269,13 @@ export class index extends Component {
             ))}
           </View>
           <Button
-            title=" Searching"
-            icon={<ActivityIndicator size={'small'} color={BaseColor.grayColor} />}
+            title={searching ? " Searching" : "  Search"}
+            icon={searching && <ActivityIndicator size={'small'} color={BaseColor.grayColor} />}
+            disabled={searching}
             containerStyle={styles.mt20}
             buttonStyle={styles.next_button}
             titleStyle={styles.next_button_txt}
-            onPress={() => { }}
+            onPress={this.addDevice.bind(this)}
           />
         </View>
       </>
@@ -304,7 +322,7 @@ export class index extends Component {
           data={this.getData()}
           renderItem={({ item, index }) => item}
         />
-        <Overlay isVisible={discoveredDevices.visible} onBackdropPress={() => {}} overlayStyle={{ width: "80%", padding: 20, maxHeight: "70%" }}>
+        <Overlay isVisible={discoveredDevices.visible} onBackdropPress={() => { }} overlayStyle={{ width: "80%", padding: 20, maxHeight: "70%" }}>
           <Text title3 blackColor bold>Select the device to connect</Text>
           <ScrollView>
             {discoveredDevices.devices.map((item, index) => (

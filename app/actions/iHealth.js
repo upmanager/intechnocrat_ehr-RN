@@ -69,6 +69,10 @@ export const startMeasure = ({ mac, type }) => {
             BG5Module.startMeasure(mac, 1);
             break;
         case "BG5S":
+            var formatted = ("2021-06-25 12:25:20");
+console.log(mac, formatted, (new Date()).getTimezoneOffset());
+            BG5SModule.setTime(mac, formatted, (new Date()).getTimezoneOffset());
+            BG5SModule.setUnit(mac, 1);
             BG5SModule.startMeasure(mac, 1);
             break;
         case "BP3L":
