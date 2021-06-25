@@ -44,6 +44,16 @@ export class index extends Component {
         })
     }
   }
+  componentWillUnmount(){
+    const { device } = this.params;
+    iHealth.disconnectDevice(device.mac, device.type)
+      .then(res => {
+        console.log("disconnected", res);
+      })
+      .catch(err => {
+        console.error("disconnected", err);
+      })
+  }
   connectFailed(err) {
     this.setState({ connection_state: _CONNECTION_STATE.DISCONNECTED })
     console.log("connect failed", err);

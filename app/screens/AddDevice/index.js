@@ -91,7 +91,7 @@ export class index extends Component {
         const { devices: { devices: registerd_devices } } = this.props;
 
         let allDevices = [...registerd_devices, ...devices];
-        if (allDevices.findIndex(item => item.mac == res.mac) >= 0) {
+        if (!res.mac || allDevices.findIndex(item => item.mac == res.mac) >= 0) {
           return;
         }
         console.log("discover", res);

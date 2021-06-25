@@ -9,7 +9,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { connect } from 'react-redux';
 import { Images } from "@assets";
 import styles from './styles';
+const { iHealth } = reduxActions;
 export class index extends Component {
+  constructor(props) {
+    super(props);
+
+    iHealth.authenConfigureInfo("", BaseConfig.CLIENTID, BaseConfig.CLIENTSECURITY)
+      .then(res => console.log(res))
+      .catch(err => console.error(err))
+  }
   addNewDevice() {
     this.props.navigation.navigate("AddDevice");
   }
