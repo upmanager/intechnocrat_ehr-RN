@@ -123,7 +123,8 @@ export class index extends Component {
       default:
         break;
     }
-    iHealth.deviceEmitter(type, HS2SProfileModule.ACTION_ONLINE_RESULT, result => {
+    iHealth.deviceEmitter(type, action_event, result => {
+      console.log(type, { result });
       if (type in ["HS2", "HS4S", "HS2S"]) {
         this.props.setWeight(result?.weight || 0);
       } else if (type in ["BG5", "GB5S"]) {
