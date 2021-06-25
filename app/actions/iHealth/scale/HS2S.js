@@ -35,6 +35,7 @@ export default (eventtype, callback) => {
     }
     DeviceEventEmitter.addListener(HS2SModule.Event_Notify, event => {
         let data = {};
+        console.log(event);
         if (eventtype && event.action != eventtype) return;
         switch (event.action) {
             case HS2SProfileModule.ACTION_GET_DEVICE_INFO:
