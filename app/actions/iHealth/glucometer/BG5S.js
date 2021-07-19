@@ -1,11 +1,11 @@
 import { DeviceEventEmitter } from 'react-native';
 import {
     BG5SModule,
-    BG5SProfileModule
+    BGProfileModule
 } from '@ihealth/ihealthlibrary-react-native';
 import { BaseConfig } from "@config";
 
-export default (eventtype, callback) => {
+export default (callback) => {
     if (BaseConfig.TETSTING) {
         const result = {
             bp: 188
@@ -15,11 +15,8 @@ export default (eventtype, callback) => {
         }, 3000);
         return;
     }
-    console.log("gluco", "event");
     DeviceEventEmitter.addListener(BG5SModule.Event_Notify, event => {
         let data = {};
-        console.log("gluco", event);
-        if (eventtype && event.action != eventtype) return;
         switch (event.action) {
             case BG5SProfileModule.ACTION_ONLINE_RESULT_BG:
                 data = event[BG5SProfileModule.ONLINE_RESULT_BG]

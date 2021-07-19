@@ -1,12 +1,12 @@
-import { store } from "@store";
 import { BaseConfig } from "@config";
+import * as logger from "./logger";
 
 const _REQUEST2SERVER = (url, isGet = true, params = null, isFormdata = false) => {
     if (isGet && params) {
         url += _GETURLPARAMS(params);
     }
     return new Promise(function (resolve, reject) {
-        console.log(`${BaseConfig.APIURLS.BASE}${url}`, isGet, isFormdata);
+        logger.log(`${BaseConfig.APIURLS.BASE}${url}`);
         fetch(`${BaseConfig.APIURLS.BASE}${url}`, {
             method: isFormdata ? "post" : isGet ? 'get' : 'post',
             headers: {
@@ -14,7 +14,10 @@ const _REQUEST2SERVER = (url, isGet = true, params = null, isFormdata = false) =
             },
             ...(!isGet && { body: isFormdata ? params : JSON.stringify(params) })
         })
-            .then(res => res.json())
+            .then(res => {
+                logger.log(res);
+                return res.json();
+            })
             .then(res => resolve(res))
             .catch(err => reject(err));
     });
@@ -31,11 +34,19 @@ const login = (data) => {
 const register = (data) => {
     return _REQUEST2SERVER(BaseConfig.APIURLS.REGISTER, true, data);
 }
-const getHealthUser = (userid) => {
-    return _REQUEST2SERVER(BaseConfig.APIURLS.HEALTHPROFILE, true, { userprofileid: userid, Restaurantid: 1884581 });
+const getHealthUser = (userid, Restaurantid) => {
+    return _REQUEST2SERVER(BaseConfig.APIURLS.HEALTHPROFILE, true, { userprofileid: userid, Restaurantid });
+}
+const getScaleDiary = (userid, restaurantid) => {
+    return _REQUEST2SERVER(BaseConfig.APIURLS.GET_WEIGHT, true, { userprofileid: userid });
+}
+const createScaleDiary = (data) => {
+    return _REQUEST2SERVER(BaseConfig.APIURLS.CREATE_WEIGHT, true, data);
 }
 export {
     login,
     register,
     getHealthUser,
+    getScaleDiary,
+    createScaleDiary
 };

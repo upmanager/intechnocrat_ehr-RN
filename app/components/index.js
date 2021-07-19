@@ -4,6 +4,7 @@ import Text from "./Text";
 import DeviceItem from "./DeviceItem";
 import CustomTabView from "./CustomTabView";
 import ButtonSelector from "./ButtonSelector";
+import HistoricalItem from "./HistoricalItem";
 
 export {
     PasswordInput,
@@ -11,6 +12,7 @@ export {
     Text,
     DeviceItem,
     CustomTabView,
-    ButtonSelector
+    ButtonSelector,
+    HistoricalItem
 };
 

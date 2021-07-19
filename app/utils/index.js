@@ -49,3 +49,22 @@ export const convertUnits = (value, { unit, default: isDefault }, maxPoint = 2, 
   }
   return value;
 }
+
+export const getBMI = (height, weight, iskg) => {
+  if (!iskg) weight = lbs2kg(weight);
+  if (height > 0 && weight > 0) {
+    return (weight) / Math.pow((height / 100), 2);
+  }
+  return 20;
+}
+export const getBodyFat = (age, strGender, BMI) => {
+  gender = strGender != null && strGender == "Male" ? 0 : 1;
+  fat = -44.988 + (0.503 * age) + (10.689 * gender) + (3.172 * BMI) - (0.026 * Math.pow(BMI, 2)) + (0.181 * BMI * gender) - (0.02 * BMI * age) - (0.005 * Math.pow(BMI, 2) * gender) + (0.00021 * Math.pow(BMI, 2) * age);
+  
+  let str = String(fat).split(".");
+  if (str.length > 1 && str[1].length > 2) {
+    value = `${str[0]}.${str[1].slice(0, 2)}`;
+  }
+  return value;
+
+}

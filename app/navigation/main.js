@@ -11,12 +11,13 @@ import Profile from "@screens/Profile";
 import About from "@screens/About";
 import QRCodeScan from "@screens/QRCodeScan";
 import ConnectDevice from "@screens/ConnectDevice";
+import { HS2S, ScaleResult } from "@screens/MeasureDevices";
 import React from "react";
 import { Icon } from 'react-native-elements';
 import { connect } from "react-redux";
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
 const horizontalAnimation = {
   cardStyleInterpolator: ({ current, layouts }) => {
     return {
@@ -69,20 +70,25 @@ const mapStateToProps = (state) => (state)
 const TabNavigatorComponent = connect(mapStateToProps, null)(TabNavigator);
 
 export default function Navigation() {
+  const _NAVIGATIONS = {
+    TabNavigator: TabNavigatorComponent,
+    AddDevice: AddDevice,
+    Global: Global,
+    Units: Units,
+    About: About,
+    Profile: Profile,
+    QRCodeScan: QRCodeScan,
+    ConnectDevice: ConnectDevice,
+    HS2S: HS2S,
+    ScaleResult: ScaleResult,
+  }
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
         }}>
-        <Stack.Screen name="TabNavigator" component={TabNavigatorComponent} />
-        <Stack.Screen name="AddDevice" component={AddDevice} options={horizontalAnimation} />
-        <Stack.Screen name="Global" component={Global} options={horizontalAnimation} />
-        <Stack.Screen name="Units" component={Units} options={horizontalAnimation} />
-        <Stack.Screen name="About" component={About} options={horizontalAnimation} />
-        <Stack.Screen name="Profile" component={Profile} options={horizontalAnimation} />
-        <Stack.Screen name="QRCodeScan" component={QRCodeScan} options={horizontalAnimation} />
-        <Stack.Screen name="ConnectDevice" component={ConnectDevice} options={horizontalAnimation} />
+        {Object.entries(_NAVIGATIONS).map(([key, value]) => <Stack.Screen name={key} component={value} options={horizontalAnimation} />)}
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -6,10 +6,10 @@ import { LinearProgress } from 'react-native-elements';
 
 export default class Header extends Component {
     render() {
-        const { renderLeft, renderRight, renderCenter, title, onPressLeft, onPressRight, loading } = this.props;
+        const { renderLeft, renderRight, renderCenter, title, onPressLeft, onPressRight, loading, height } = this.props;
         return (
             <>
-                <View style={styles.container}>
+                <View style={[styles.container, height && { height }]}>
                     <View style={[styles.action, { alignItems: "flex-start" }]}>
                         {renderLeft && (
                             <TouchableOpacity onPress={onPressLeft}>

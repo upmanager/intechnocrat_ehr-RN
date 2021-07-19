@@ -9,19 +9,19 @@ export default [
             // {
             //   id: 1,
             //   title: "Align (BG1)",
-            //   image: Images.align_bg1,
+            //   image: Images.icon_device_bg1,
             //   device: 'BG1',
             // },
             {
                 id: 2,
                 title: "Gluco (BG5)",
-                image: Images.gluco_bg5,
+                image: Images.icon_device_bg5,
                 device: 'BG5'
             },
             {
                 id: 3,
                 title: "Gluco+ (BG5S)",
-                image: Images.gluco_bg5s,
+                image: Images.icon_device_bg5s,
                 device: 'BG5S'
             },
         ]
@@ -34,7 +34,7 @@ export default [
             {
                 id: 1,
                 title: "Ease (BP3L)",
-                image: Images.ease_bp3l,
+                image: Images.icon_device_bp3l,
                 device: 'BP3L',
                 setup_guide: [
                     {
@@ -46,7 +46,7 @@ export default [
             {
                 id: 2,
                 title: "Feel (BP5)",
-                image: Images.feel_bp5,
+                image: Images.icon_device_bp5,
                 device: 'BP5',
                 setup_guide: [
                     {
@@ -58,7 +58,7 @@ export default [
             {
                 id: 3,
                 title: "NEO (BP5S)",
-                image: Images.neo_bp5s,
+                image: Images.icon_device_bp5s,
                 device: 'BP5S',
                 setup_guide: [
                     {
@@ -70,21 +70,33 @@ export default [
             {
                 id: 4,
                 title: "View (BP7S)",
-                image: Images.view_bp7s,
+                image: Images.icon_device_bp7s,
                 device: 'BP7S',
                 hide: true
-            }
+            },
+            {
+                id: 5,
+                title: "Track (KN550BT)",
+                image: Images.icon_device_kn550bt,
+                device: 'KN550BT',
+                setup_guide: [
+                    {
+                        description: 'Make sure your device is fully charged',
+                        image: Images.setup_bp3l,
+                    }
+                ]
+            },
         ]
     },
     {
         id: 3,
         title: "Wireless Body Composition Scale",
-        image: Images.diagonal,
+        image: Images.scale,
         devices: [
             {
                 id: 1,
                 title: "Lina (HS2)",
-                image: Images.lina_hs2,
+                image: Images.icon_device_hs2,
                 device: 'HS2',
                 setup_guide: [
                     {
@@ -100,7 +112,7 @@ export default [
             {
                 id: 2,
                 title: "Lite (HS4S)",
-                image: Images.lite_hs4s,
+                image: Images.icon_device_hs4s,
                 device: 'HS4S',
                 setup_guide: [
                     {
@@ -112,7 +124,7 @@ export default [
             {
                 id: 3,
                 title: "Fit/Nexus (HS2S)",
-                image: Images.fit_nexus_hs2s,
+                image: Images.icon_device_hs2s,
                 device: 'HS2S',
                 setup_guide: [
                     {
@@ -124,7 +136,7 @@ export default [
             {
                 id: 4,
                 title: "Core (HS6)",
-                image: Images.core_hs6,
+                image: Images.icon_device_hs6,
                 device: 'HS6', // no eixt
                 hide: true,
                 scanQRcode: true
@@ -134,18 +146,18 @@ export default [
     {
         id: 4,
         title: "Wave Wireless Activity Tracker",
-        image: Images.wave,
+        image: Images.activity_tracker,
         devices: [
             {
                 id: 1,
                 title: "Edge (AM3S)",
-                image: Images.edge_am3s,
+                image: Images.icon_device_am3s,
                 device: 'AM3S'
             },
             {
                 id: 2,
                 title: "Wave (AM4)",
-                image: Images.wave_am4,
+                image: Images.icon_device_am4,
                 device: 'AM4'
             }
         ]

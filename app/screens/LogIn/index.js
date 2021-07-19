@@ -37,7 +37,7 @@ class LogIn extends Component {
     this.setValidateState({ show_password: !show_password })
   }
   forgotPassword() {
-    Linking.openURL(BaseConfig.FORGOTPASSWORDLINK);
+    // Linking.openURL(BaseConfig.FORGOTPASSWORDLINK);
   }
   login() {
     const { Username, Password, fbuser } = this.state;

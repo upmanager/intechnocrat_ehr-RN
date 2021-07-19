@@ -1,0 +1,27 @@
+BP data
+
+{
+    "time": "2018-01-01 00:15:00",
+    "sys": 103,
+    "dia": 74,
+    "heartRate": 64,
+    "scheme_id": 0,
+    "arrhythmia": false,
+    "body_movement": false,
+    "dataID": "CAC59A611EECA673CC55837E6D22CC3C"
+}
+
+
+get_swim_time
+
+get_swiminfo_am
+{"get_swim_switch_am":2,"get_swimlane_length":20,"get_swim_cutout_hour_am":0,"get_swim_cutout_min_am":30,"get_swim_unit_am":0}
+
+action = "sync_real_data_am"
+message = "{"step":0,"calorie":0,"totalcalories":444}"
+
+action = "sync_sleep_data_am"
+message = "{"sleep":[{"sleep_each_data":[]}]}"
+
+action = "sync_stage_data_am"
+message = "{"stage_data":[]}"

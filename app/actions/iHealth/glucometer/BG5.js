@@ -5,7 +5,7 @@ import {
 } from '@ihealth/ihealthlibrary-react-native';
 import { BaseConfig } from "@config";
 
-export default (eventtype, callback) => {
+export default (callback) => {
     if (BaseConfig.TETSTING) {
         const result = {
             // bp: 188
@@ -17,7 +17,6 @@ export default (eventtype, callback) => {
     }
     DeviceEventEmitter.addListener(BG5Module.Event_Notify, event => {
         let data = {};
-        if (eventtype && event.action != eventtype) return;
         switch (event.action) {
             case BGProfileModule.ACTION_ONLINE_RESULT_BG:
                 data = event[BGProfileModule.ONLINE_RESULT_BG]

@@ -5,7 +5,7 @@ import {
 } from '@ihealth/ihealthlibrary-react-native';
 import { BaseConfig } from "@config";
 
-export default (eventtype, callback) => {
+export default (callback) => {
     if (BaseConfig.TETSTING) {
         const result = {
             weight: 188
@@ -17,7 +17,6 @@ export default (eventtype, callback) => {
     }
     DeviceEventEmitter.addListener(AM4Module.Event_Notify, event => {
         let data = {};
-        if (eventtype && event.action != eventtype) return;
         switch (event.action) {
             case AMProfileModule:
                 break;

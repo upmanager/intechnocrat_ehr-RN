@@ -11,12 +11,12 @@ export const login = (data, callback) => dispatch => {
             if (user?.LoginStatus == "Login Success") {
                 let health_profile = {};
                 try {
-                    health_profile = await ApiActions.getHealthUser(user.UserProfileID);
+                    health_profile = await ApiActions.getHealthUser(user.UserProfileID, user.RestaurantProfileID);
                     health_profile = health_profile.GetUserHealthProfileResult[0] || {};
                 } catch (error) {
                     health_profile = {};
                 }
-
+                console.log(health_profile);
                 dispatch({ type: GETUSERSUCCESS, data: { user, health_profile, login: true } });
                 callback({ ...data, success: true });
             } else {

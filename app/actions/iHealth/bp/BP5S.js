@@ -5,7 +5,7 @@ import {
 } from '@ihealth/ihealthlibrary-react-native';
 import { BaseConfig } from "@config";
 
-export default (eventtype, callback) => {
+export default (callback) => {
     if (BaseConfig.TETSTING) {
         const result = {
             bp: 188
@@ -17,7 +17,6 @@ export default (eventtype, callback) => {
     }
     DeviceEventEmitter.addListener(BP5SModule.Event_Notify, event => {
         let data = {};
-        if (eventtype && event.action != eventtype) return;
         
         if (event.action === BPProfileModule.ACTION_ONLINE_PULSEWAVE_BP) {
             data = event;
