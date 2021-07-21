@@ -88,7 +88,7 @@ export default function Navigation() {
         screenOptions={{
           headerShown: false,
         }}>
-        {Object.entries(_NAVIGATIONS).map(([key, value]) => <Stack.Screen name={key} component={value} options={horizontalAnimation} />)}
+        {Object.entries(_NAVIGATIONS).map(([key, value]) => <Stack.Screen name={key} key={key} component={value} options={horizontalAnimation} />)}
       </Stack.Navigator>
     </NavigationContainer>
   )

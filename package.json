@@ -22,7 +22,7 @@
     "path": "^0.12.7",
     "react": "17.0.1",
     "react-native": "0.64.2",
-    "react-native-camera": "^3.44.1",
+    "react-native-camera": "^4.0.0",
     "react-native-chart-kit": "^6.11.0",
     "react-native-elements": "^3.4.2",
     "react-native-fs": "^2.18.0",

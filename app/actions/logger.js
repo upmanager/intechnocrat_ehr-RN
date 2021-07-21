@@ -19,7 +19,7 @@ const initFileLogs = () => {
 
     fileLogs = logger.createLogger(config);
 }
-global.log_path = `${RNFS.CachesDirectoryPath}/logger`;
+global.log_path = `${RNFS.DownloadDirectoryPath}/logger`;
 RNFS.exists(global.log_path)
     .then(res => {
         if (!res) {
