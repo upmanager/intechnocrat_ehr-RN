@@ -57,7 +57,7 @@ export class HS2S extends Component {
         const { auth: { user, health_profile }, units: { weight: weight_units } } = this.props;
 
         HS2SModule.setUnit(mac, weight_units);
-        HS2SModule.measure(mac, user.userType || 0, this.str_userid, 0, health_profile.WeightKg || 0, health_profile.Age, health_profile.Height || 0, gender, 0, 0);
+        HS2SModule.measure(mac, user.userType || 0, this.str_userid, 0, health_profile.WeightKg || 0, health_profile.Age, health_profile.Height || 0, this.gender, 0, 0);
         HS2SModule.resetDevice(mac);
     }
     goBack() {
@@ -118,7 +118,6 @@ export class HS2S extends Component {
                 default:
                     break;
             }
-            callback(data);
         });
     }
     scaleDevices(type, result) {
