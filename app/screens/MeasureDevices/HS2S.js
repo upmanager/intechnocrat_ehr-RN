@@ -58,11 +58,11 @@ export class HS2S extends Component {
 
         HS2SModule.setUnit(mac, weight_units);
         HS2SModule.measure(mac, user.userType || 0, this.str_userid, 0, health_profile.WeightKg || 0, health_profile.Age, health_profile.Height || 0, this.gender, 0, 0);
-        HS2SModule.resetDevice(mac);
+        // HS2SModule.resetDevice(mac);
     }
     goBack() {
         this.params?.goBack?.();
-        this.props.navigation?.goBack?.();
+        this.props?.navigation?.goBack?.();
     }
     disconnectDevice() {
         const { device } = this.params;
@@ -83,6 +83,7 @@ export class HS2S extends Component {
         }, callback);
     }
     getDeviceEmitter() {
+        DeviceEventEmitter.removeAllListeners();
         DeviceEventEmitter.addListener(HS2SModule.Event_Notify, event => {
             logger.log("Emitter => ", event);
             // const emitter = [HS2SProfileModule.ACTION_GET_DEVICE_INFO, HS2SProfileModule.ACTION_SET_UNIT_SUCCESS, HS2SProfileModule.ACTION_CREATE_OR_UPDATE_USER_INFO, HS2SProfileModule.ACTION_DELETE_USER_INFO, HS2SProfileModule.ACTION_DELETE_HISTORY_DATA, HS2SProfileModule.ACTION_SPECIFY_USERS, HS2SProfileModule.ACTION_RESTORE_FACTORY_SETTINGS, HS2SProfileModule.ACTION_HS2S_MEASURE_HEARTRATE];
@@ -91,10 +92,13 @@ export class HS2S extends Component {
             //     return;
             // }
             switch (event.action) {
-                case HS2SProfileModule.ACTION_BATTERY_HS:
+                case "action_get_battery_hs":
                     this.setDataState({ battery: event[HS2SProfileModule.BATTERY_HS] });
                     break;
-                case HS2SProfileModule.ACTION_HISTORY_DATA:
+                case "action_anonymous_data":
+                    this.updateHistory(event['history_data']);
+                    break;
+                case "action_history_data":
                     this.updateHistory(event['history_data']);
                     break;
                 case HS2SProfileModule.ACTION_ONLINE_REAL_TIME_WEIGHT:
@@ -106,7 +110,7 @@ export class HS2S extends Component {
                         this.setState({ curRealtimeWeight: 0 })
                     }, 5000);
                     break;
-                case HS2SProfileModule.ACTION_BODY_FAT_RESULT:
+                case "action_body_fat_result":
                     this.updateBodyfat(event[HS2SProfileModule.DATA_BODY_FAT_RESULT]);
                     break;
                 case HS2SProfileModule.ACTION_MEASURE_FINISH_AT_CRITICAL:
@@ -182,11 +186,11 @@ export class HS2S extends Component {
         const scaledata = {
             userprofileid, restaurantid, clinicid, bmi, bonevalue, fatvalue, musclevalue, watevalue, weightkg: weight, weightibs, todaysdate, timerecorded, comments, heartrate
         };
-        if (this.heartrate) {
-            this.props.navigation.navigate("ScaleResult", { data: scaledata });
-        } else {
-            this.scaledata = scaledata;
-        }
+        // if (this.heartrate) {
+        this.props.navigation.navigate("ScaleResult", { data: scaledata });
+        // } else {
+        // this.scaledata = scaledata;
+        // }
     }
     updateHeartrate({ status, heartrate }) {
         if (this.scaledata) {
@@ -210,7 +214,10 @@ export class HS2S extends Component {
                     renderRight={
                         <Icon name={'cog'} size={30} type={'font-awesome'} color={BaseColor.whiteColor} />
                     }
-                    onPressRight={() => this._carousel.snapToItem(2)}
+                    onPressRight={() => {
+                        HS2SModule.getBattery(this.params.device.mac);
+                        this._carousel.snapToItem(2)
+                    }}
                 />
                 <ScrollView style={{ padding: 40 }} contentContainerStyle={{ alignItems: "center" }}>
                     <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}>
@@ -236,6 +243,7 @@ export class HS2S extends Component {
         this.setState({ loading: true });
         this._carousel.snapToItem(1)
         const { device: { mac } } = this.params;
+        HS2SModule.getAnonymousMemoryData(mac);
         HS2SModule.getMemoryData(mac, this.str_userid);
     }
     renderHistory() {
@@ -249,7 +257,6 @@ export class HS2S extends Component {
                     }
                     loading={loading}
                     onPressLeft={() => this._carousel.snapToItem(0)}
-                    loading={true}
                 />
                 <FlatList
                     data={historicaldata}
